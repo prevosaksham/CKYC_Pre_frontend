@@ -1608,7 +1608,10 @@ const PreRequisiteForm = () => {
                                 <td>8</td>
                                 <td>
                                   <div className="d-flex align-items-center gap-2">
-                                    <span>VM connected on Port <span className="text-danger">*</span></span>
+                                    <div>
+                                      VM connected on Port <span className="text-danger">*</span><br />
+                                      <small className="text-muted">Port 5000</small>
+                                    </div>
                                     <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip="Port 5000"></i>
                                   </div>
                                 </td>
