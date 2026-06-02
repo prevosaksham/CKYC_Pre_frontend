@@ -2834,7 +2834,7 @@ const PreRequisiteForm = () => {
                                 <td>1</td>
                                 <td>
                                   Hardware Requirements (Prod) <span className="text-danger">**</span><br />
-                                  <small className="text-muted">Recomended : 8 vCPUs / 32 GB RAM / 50 GB SSD (2 Servers)</small>
+                                  <small className="text-muted">Recomended : 8 vCPUs / 32 GB RAM / 100 GB SSD (2 Servers)</small>
                                 </td>
                                 <td>
                                   <select
