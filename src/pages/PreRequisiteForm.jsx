@@ -1567,13 +1567,13 @@ const PreRequisiteForm = () => {
                                   />
                                 </td>
                               </tr>
-                              <tr>
+                               <tr>
                                 <td>6</td>
                                 <td>
                                   <div className="d-flex align-items-center gap-2">
                                     <div>
                                       Firewall <span className="text-danger">*</span><br />
-                                      <small className="text-muted">Port 443. Port 80 allow only when Load balancer is used</small>
+                                      <small className="text-muted">Open port 443 for public HTTPS access. Open port 80 publicly only for Let's Encrypt validation. If SSL is terminated at the Load Balancer, port 80 is used only for LB-to-VM forwarding and is not exposed to the public.</small>
                                     </div>
                                     <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip="Required ports allowed"></i>
                                   </div>
@@ -2987,7 +2987,7 @@ const PreRequisiteForm = () => {
                                   <div className="d-flex align-items-center gap-2">
                                     <div>
                                       Firewall <span className="text-danger">*</span><br />
-                                      <small className="text-muted">Port 443. Port 80 allow only when Load balancer is used</small>
+                                      <small className="text-muted">Open port 443 for public HTTPS access. Open port 80 publicly only for Let's Encrypt validation. If SSL is terminated at the Load Balancer, port 80 is used only for LB-to-VM forwarding and is not exposed to the public.</small>
                                     </div>
                                     <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip="Required ports allowed"></i>
                                   </div>
