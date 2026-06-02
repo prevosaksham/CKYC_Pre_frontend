@@ -345,6 +345,17 @@ const PreRequisiteForm = () => {
     rootAccessStatus: '',
     rootAccessRemarks: '',
 
+    vmPort5000Status: '',
+    vmPort5000Remarks: '',
+    sslRequiredStatus: '',
+    sslRequiredRemarks: '',
+    twoIpsNatStatus: '',
+    twoIpsNatRemarks: '',
+    ocrDependenciesStatus: '',
+    ocrDependenciesRemarks: '',
+    s3BucketStatus: '',
+    s3BucketRemarks: '',
+
 
     // Organization Details
     organizationName: '',
@@ -772,7 +783,9 @@ const PreRequisiteForm = () => {
   const handleNextUatInfra = () => {
     const requiredFields = [
       'hardwareUATStatus', 'osNameVersion', 'internetConnectivityStatus',
-      'dnsMappingStatus', 'portStatus', 'firewallStatus', 'rootAccessStatus'
+      'dnsMappingStatus', 'portStatus', 'firewallStatus', 'rootAccessStatus',
+      'vmPort5000Status', 'sslRequiredStatus', 'twoIpsNatStatus',
+      'ocrDependenciesStatus', 's3BucketStatus'
     ];
     const missing = requiredFields.some(field => !formData[field]);
     if (!isViewMode && missing) {
@@ -828,6 +841,11 @@ const PreRequisiteForm = () => {
       if (!formData.portStatus) missingFields.push('Cross VM Connectivity (Ports)');
       if (!formData.firewallStatus) missingFields.push('Firewall');
       if (!formData.rootAccessStatus) missingFields.push('Root Access');
+      if (!formData.vmPort5000Status) missingFields.push('VM connected on Port 5000');
+      if (!formData.sslRequiredStatus) missingFields.push('SSL Certificate Required');
+      if (!formData.twoIpsNatStatus) missingFields.push('2 IP for API & SFTP');
+      if (!formData.ocrDependenciesStatus) missingFields.push('Need to install dependencies for OCR');
+      if (!formData.s3BucketStatus) missingFields.push('S3 Bucket/file server');
       if (!formData.organizationName?.trim()) missingFields.push('Organization Name');
       if (!formData.fiCodeOrgCode?.trim()) missingFields.push('FI Code / Org Code');
       if (!formData.regionCode?.trim()) missingFields.push('Region Code');
@@ -914,6 +932,16 @@ const PreRequisiteForm = () => {
           rootAccessRemarks: formData.rootAccessRemarks,
           timeSyncStatus: formData.timeSyncStatus,
           timeSyncRemarks: formData.timeSyncRemarks,
+          vmPort5000Status: formData.vmPort5000Status,
+          vmPort5000Remarks: formData.vmPort5000Remarks,
+          sslRequiredStatus: formData.sslRequiredStatus,
+          sslRequiredRemarks: formData.sslRequiredRemarks,
+          twoIpsNatStatus: formData.twoIpsNatStatus,
+          twoIpsNatRemarks: formData.twoIpsNatRemarks,
+          ocrDependenciesStatus: formData.ocrDependenciesStatus,
+          ocrDependenciesRemarks: formData.ocrDependenciesRemarks,
+          s3BucketStatus: formData.s3BucketStatus,
+          s3BucketRemarks: formData.s3BucketRemarks,
           // Organization - map to correct field names
           organizationName: formData.organizationName,
           organizationNameRemarks: formData.organizationNameRemarks,
@@ -1360,11 +1388,11 @@ const PreRequisiteForm = () => {
                               </tr>
                             </thead>
                             <tbody>
-                              <tr>
+                               <tr>
                                 <td>1</td>
                                 <td>
                                   Hardware Requirements (UAT)<br />
-                                  <small className="text-muted">Recomended : 4 vCPUs / 16 GB RAM / 50 GB SSD (2 Servers)</small>
+                                  <small className="text-muted">Recomended : 2 vCPUs / 16 GB RAM / 50 GB SSD (2 Servers)</small>
                                 </td>
                                 <td>
                                   <select
@@ -1516,8 +1544,8 @@ const PreRequisiteForm = () => {
                                 <td>
                                   <div className="d-flex align-items-center gap-2">
                                     <div>
-                                      Firewall<br />
-                                      <small className="text-muted">Open port 443 for public HTTPS access. Open port 80 publicly only for Let's Encrypt validation. If SSL is terminated at the Load Balancer, port 80 is used only for LB-to-VM forwarding and is not exposed to the public.</small>
+                                      Firewall <span className="text-danger">*</span><br />
+                                      <small className="text-muted">Port 443. Port 80 allow only when Load balancer is used</small>
                                     </div>
                                     <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip="Required ports allowed"></i>
                                   </div>
@@ -1550,7 +1578,7 @@ const PreRequisiteForm = () => {
                                 <td>
                                   <div className="d-flex align-items-center gap-2">
                                     <span>Root Access <span className="text-danger">*</span></span>
-                                    <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip="ROOT user access provided"></i>
+                                    <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip="Admin/Sudo access required"></i>
                                   </div>
                                 </td>
                                 <td>
@@ -1571,6 +1599,161 @@ const PreRequisiteForm = () => {
                                     className="form-control"
                                     name="rootAccessRemarks"
                                     value={formData.rootAccessRemarks}
+                                    onChange={handleChange}
+                                    placeholder="Remarks"
+                                  />
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>8</td>
+                                <td>
+                                  <div className="d-flex align-items-center gap-2">
+                                    <span>VM connected on Port <span className="text-danger">*</span></span>
+                                    <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip="Port 5000"></i>
+                                  </div>
+                                </td>
+                                <td>
+                                  <select
+                                    className="form-select"
+                                    name="vmPort5000Status"
+                                    value={formData.vmPort5000Status}
+                                    onChange={handleChange}
+                                    required={!isViewMode && activeTab === 'uat'}
+                                  >
+                                    <option value="">Select</option>
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                  </select>
+                                </td>
+                                <td>
+                                  <input
+                                    className="form-control"
+                                    name="vmPort5000Remarks"
+                                    value={formData.vmPort5000Remarks}
+                                    onChange={handleChange}
+                                    placeholder="Remarks"
+                                  />
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>9</td>
+                                <td>
+                                  <div className="d-flex align-items-center gap-2">
+                                    <span>SSL certificate required <span className="text-danger">*</span></span>
+                                    <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip="Required for secure HTTPS connection"></i>
+                                  </div>
+                                </td>
+                                <td>
+                                  <select
+                                    className="form-select"
+                                    name="sslRequiredStatus"
+                                    value={formData.sslRequiredStatus}
+                                    onChange={handleChange}
+                                    required={!isViewMode && activeTab === 'uat'}
+                                  >
+                                    <option value="">Select</option>
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                  </select>
+                                </td>
+                                <td>
+                                  <input
+                                    className="form-control"
+                                    name="sslRequiredRemarks"
+                                    value={formData.sslRequiredRemarks}
+                                    onChange={handleChange}
+                                    placeholder="Remarks"
+                                  />
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>10</td>
+                                <td>
+                                  <div className="d-flex align-items-center gap-2">
+                                    <span>2 IP for API & SFTP <span className="text-danger">*</span></span>
+                                    <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip="NAT Outbound IPs"></i>
+                                  </div>
+                                </td>
+                                <td>
+                                  <select
+                                    className="form-select"
+                                    name="twoIpsNatStatus"
+                                    value={formData.twoIpsNatStatus}
+                                    onChange={handleChange}
+                                    required={!isViewMode && activeTab === 'uat'}
+                                  >
+                                    <option value="">Select</option>
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                  </select>
+                                </td>
+                                <td>
+                                  <input
+                                    className="form-control"
+                                    name="twoIpsNatRemarks"
+                                    value={formData.twoIpsNatRemarks}
+                                    onChange={handleChange}
+                                    placeholder="Remarks"
+                                  />
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>11</td>
+                                <td>
+                                  <div className="d-flex align-items-center gap-2">
+                                    <span>Need to install dependencies for OCR <span className="text-danger">*</span></span>
+                                    <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip="If required"></i>
+                                  </div>
+                                </td>
+                                <td>
+                                  <select
+                                    className="form-select"
+                                    name="ocrDependenciesStatus"
+                                    value={formData.ocrDependenciesStatus}
+                                    onChange={handleChange}
+                                    required={!isViewMode && activeTab === 'uat'}
+                                  >
+                                    <option value="">Select</option>
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                  </select>
+                                </td>
+                                <td>
+                                  <input
+                                    className="form-control"
+                                    name="ocrDependenciesRemarks"
+                                    value={formData.ocrDependenciesRemarks}
+                                    onChange={handleChange}
+                                    placeholder="Remarks"
+                                  />
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>12</td>
+                                <td>
+                                  <div className="d-flex align-items-center gap-2">
+                                    <span>S3 Bucket/file server <span className="text-danger">*</span></span>
+                                    <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip="File storage"></i>
+                                  </div>
+                                </td>
+                                <td>
+                                  <select
+                                    className="form-select"
+                                    name="s3BucketStatus"
+                                    value={formData.s3BucketStatus}
+                                    onChange={handleChange}
+                                    required={!isViewMode && activeTab === 'uat'}
+                                  >
+                                    <option value="">Select</option>
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                  </select>
+                                </td>
+                                <td>
+                                  <input
+                                    className="form-control"
+                                    name="s3BucketRemarks"
+                                    value={formData.s3BucketRemarks}
                                     onChange={handleChange}
                                     placeholder="Remarks"
                                   />
