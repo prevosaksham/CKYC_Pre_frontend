@@ -581,8 +581,8 @@ const PreRequisiteForm = () => {
                 prodHardwareProdRemarks: data.hardwareProdRemarks || '',
                 prodInternetConnectivityStatus: data.internetConnectivityStatus || '',
                 prodInternetConnectivityRemarks: data.internetConnectivityRemarks || '',
-                prodPublicIPStatus: data.publicIPStatus || '',
-                prodPublicIPRemarks: data.publicIPRemarks || '',
+                prodOsNameVersion: data.publicIPStatus || '',
+                prodOsNameVersionRemarks: data.publicIPRemarks || '',
                 prodDnsMappingStatus: data.dnsMappingStatus || '',
                 prodDnsMappingRemarks: data.dnsMappingRemarks || '',
                 prodPortStatus: data.port80443Status || '',
@@ -649,9 +649,12 @@ const PreRequisiteForm = () => {
                 prodAcceptanceConfirmed: true
               }));
             } else {
+              setActiveTab('uat');
               setFormData(prev => ({
                 ...prev,
                 ...data,
+                osNameVersion: data.publicIPStatus || '',
+                osNameVersionRemarks: data.publicIPRemarks || '',
                 portStatus: data.port80443Status || '',
                 portRemarks: data.port80443Remarks || '',
                 fiCodeOrgCode: data.fiCode || '',
@@ -932,8 +935,8 @@ const PreRequisiteForm = () => {
           hardwareUATRemarks: formData.hardwareUATRemarks,
           internetConnectivityStatus: formData.internetConnectivityStatus,
           internetConnectivityRemarks: formData.internetConnectivityRemarks,
-          publicIPStatus: formData.publicIPStatus,
-          publicIPRemarks: formData.publicIPRemarks,
+          publicIPStatus: formData.osNameVersion,
+          publicIPRemarks: formData.osNameVersionRemarks,
           dnsMappingStatus: formData.dnsMappingStatus,
           dnsMappingRemarks: formData.dnsMappingRemarks,
           port80443Status: formData.portStatus,
@@ -1029,8 +1032,8 @@ const PreRequisiteForm = () => {
           hardwareProdRemarks: formData.prodHardwareProdRemarks,
           internetConnectivityStatus: formData.prodInternetConnectivityStatus,
           internetConnectivityRemarks: formData.prodInternetConnectivityRemarks,
-          publicIPStatus: formData.prodPublicIPStatus,
-          publicIPRemarks: formData.prodPublicIPRemarks,
+          publicIPStatus: formData.prodOsNameVersion,
+          publicIPRemarks: formData.prodOsNameVersionRemarks,
           dnsMappingStatus: formData.prodDnsMappingStatus,
           dnsMappingRemarks: formData.prodDnsMappingRemarks,
           port80443Status: formData.prodPortStatus,

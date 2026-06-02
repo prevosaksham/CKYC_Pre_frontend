@@ -395,16 +395,61 @@ const FormList = () => {
                     {/* Section 2: Infrastructure Validation */}
                     <div className="detail-section">
                       <h6><i className="bi bi-hdd-network me-2"></i>Infrastructure Validation</h6>
-                      <div className="detail-row"><span className="detail-label">Hardware Status</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.hardwareUATStatus || selectedForm.hardwareProdStatus)}</span></div>
-                      <div className="detail-row"><span className="detail-label">Hardware Remarks</span><span className="detail-value">{selectedForm.hardwareUATRemarks || selectedForm.hardwareProdRemarks || '-'}</span></div>
-                      <div className="detail-row"><span className="detail-label">Internet Connectivity</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.internetConnectivityStatus)}</span></div>
-                      <div className="detail-row"><span className="detail-label">Internet Remarks</span><span className="detail-value">{selectedForm.internetConnectivityRemarks || '-'}</span></div>
-                      <div className="detail-row"><span className="detail-label">DNS Mapping</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.dnsMappingStatus)}</span></div>
-                      <div className="detail-row"><span className="detail-label">DNS Remarks</span><span className="detail-value">{selectedForm.dnsMappingRemarks || '-'}</span></div>
-                      <div className="detail-row"><span className="detail-label">Port 80/443</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.port80443Status)}</span></div>
-                      <div className="detail-row"><span className="detail-label">Port Remarks</span><span className="detail-value">{selectedForm.port80443Remarks || '-'}</span></div>
-                      <div className="detail-row"><span className="detail-label">Firewall</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.firewallStatus)}</span></div>
-                      <div className="detail-row"><span className="detail-label">Firewall Remarks</span><span className="detail-value">{selectedForm.firewallRemarks || '-'}</span></div>
+                      {selectedForm.ckycEnvironment === 'Production' ? (
+                        <>
+                          <div className="detail-row"><span className="detail-label">Hardware Requirements (Prod)</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.hardwareProdStatus)}</span></div>
+                          <div className="detail-row"><span className="detail-label">Hardware Remarks</span><span className="detail-value">{selectedForm.hardwareProdRemarks || '-'}</span></div>
+                          <div className="detail-row"><span className="detail-label">OS Name & Version</span><span className="detail-value">{selectedForm.prodOsNameVersion || '-'}</span></div>
+                          <div className="detail-row"><span className="detail-label">OS Remarks</span><span className="detail-value">{selectedForm.prodOsNameVersionRemarks || '-'}</span></div>
+                          <div className="detail-row"><span className="detail-label">Internet Connectivity</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.internetConnectivityStatus)}</span></div>
+                          <div className="detail-row"><span className="detail-label">Internet Remarks</span><span className="detail-value">{selectedForm.internetConnectivityRemarks || '-'}</span></div>
+                          <div className="detail-row"><span className="detail-label">Domain/DNS Mapping</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.dnsMappingStatus)}</span></div>
+                          <div className="detail-row"><span className="detail-label">Domain Remarks</span><span className="detail-value">{selectedForm.dnsMappingRemarks || '-'}</span></div>
+                          <div className="detail-row"><span className="detail-label">Cross VM Connectivity</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.port80443Status)}</span></div>
+                          <div className="detail-row"><span className="detail-label">Cross VM Remarks</span><span className="detail-value">{selectedForm.port80443Remarks || '-'}</span></div>
+                          <div className="detail-row"><span className="detail-label">Firewall</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.firewallStatus)}</span></div>
+                          <div className="detail-row"><span className="detail-label">Firewall Remarks</span><span className="detail-value">{selectedForm.firewallRemarks || '-'}</span></div>
+                          <div className="detail-row"><span className="detail-label">Root Access</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.rootAccessStatus)}</span></div>
+                          <div className="detail-row"><span className="detail-label">Root Access Remarks</span><span className="detail-value">{selectedForm.rootAccessRemarks || '-'}</span></div>
+                          <div className="detail-row"><span className="detail-label">VM connected on Port 5000</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.prodVmPort5000Status)}</span></div>
+                          <div className="detail-row"><span className="detail-label">Port 5000 Remarks</span><span className="detail-value">{selectedForm.prodVmPort5000Remarks || '-'}</span></div>
+                          <div className="detail-row"><span className="detail-label">SSL Certificate Required</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.prodSslRequiredStatus)}</span></div>
+                          <div className="detail-row"><span className="detail-label">SSL Remarks</span><span className="detail-value">{selectedForm.prodSslRequiredRemarks || '-'}</span></div>
+                          <div className="detail-row"><span className="detail-label">2 IP for API & SFTP</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.prodTwoIpsNatStatus)}</span></div>
+                          <div className="detail-row"><span className="detail-label">2 IP Remarks</span><span className="detail-value">{selectedForm.prodTwoIpsNatRemarks || '-'}</span></div>
+                          <div className="detail-row"><span className="detail-label">OCR Dependencies</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.prodOcrDependenciesStatus)}</span></div>
+                          <div className="detail-row"><span className="detail-label">OCR Remarks</span><span className="detail-value">{selectedForm.prodOcrDependenciesRemarks || '-'}</span></div>
+                          <div className="detail-row"><span className="detail-label">S3 Bucket/file server</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.prodS3BucketStatus)}</span></div>
+                          <div className="detail-row"><span className="detail-label">S3 Remarks</span><span className="detail-value">{selectedForm.prodS3BucketRemarks || '-'}</span></div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="detail-row"><span className="detail-label">Hardware Requirements (UAT)</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.hardwareUATStatus)}</span></div>
+                          <div className="detail-row"><span className="detail-label">Hardware Remarks</span><span className="detail-value">{selectedForm.hardwareUATRemarks || '-'}</span></div>
+                          <div className="detail-row"><span className="detail-label">OS Name & Version</span><span className="detail-value">{selectedForm.osNameVersion || '-'}</span></div>
+                          <div className="detail-row"><span className="detail-label">OS Remarks</span><span className="detail-value">{selectedForm.osNameVersionRemarks || '-'}</span></div>
+                          <div className="detail-row"><span className="detail-label">Internet Connectivity</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.internetConnectivityStatus)}</span></div>
+                          <div className="detail-row"><span className="detail-label">Internet Remarks</span><span className="detail-value">{selectedForm.internetConnectivityRemarks || '-'}</span></div>
+                          <div className="detail-row"><span className="detail-label">Domain/DNS Mapping</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.dnsMappingStatus)}</span></div>
+                          <div className="detail-row"><span className="detail-label">Domain Remarks</span><span className="detail-value">{selectedForm.dnsMappingRemarks || '-'}</span></div>
+                          <div className="detail-row"><span className="detail-label">Cross VM Connectivity</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.port80443Status)}</span></div>
+                          <div className="detail-row"><span className="detail-label">Cross VM Remarks</span><span className="detail-value">{selectedForm.port80443Remarks || '-'}</span></div>
+                          <div className="detail-row"><span className="detail-label">Firewall</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.firewallStatus)}</span></div>
+                          <div className="detail-row"><span className="detail-label">Firewall Remarks</span><span className="detail-value">{selectedForm.firewallRemarks || '-'}</span></div>
+                          <div className="detail-row"><span className="detail-label">Root Access</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.rootAccessStatus)}</span></div>
+                          <div className="detail-row"><span className="detail-label">Root Access Remarks</span><span className="detail-value">{selectedForm.rootAccessRemarks || '-'}</span></div>
+                          <div className="detail-row"><span className="detail-label">VM connected on Port 5000</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.vmPort5000Status)}</span></div>
+                          <div className="detail-row"><span className="detail-label">Port 5000 Remarks</span><span className="detail-value">{selectedForm.vmPort5000Remarks || '-'}</span></div>
+                          <div className="detail-row"><span className="detail-label">SSL Certificate Required</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.sslRequiredStatus)}</span></div>
+                          <div className="detail-row"><span className="detail-label">SSL Remarks</span><span className="detail-value">{selectedForm.sslRequiredRemarks || '-'}</span></div>
+                          <div className="detail-row"><span className="detail-label">2 IP for API & SFTP</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.twoIpsNatStatus)}</span></div>
+                          <div className="detail-row"><span className="detail-label">2 IP Remarks</span><span className="detail-value">{selectedForm.twoIpsNatRemarks || '-'}</span></div>
+                          <div className="detail-row"><span className="detail-label">OCR Dependencies</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.ocrDependenciesStatus)}</span></div>
+                          <div className="detail-row"><span className="detail-label">OCR Remarks</span><span className="detail-value">{selectedForm.ocrDependenciesRemarks || '-'}</span></div>
+                          <div className="detail-row"><span className="detail-label">S3 Bucket/file server</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.s3BucketStatus)}</span></div>
+                          <div className="detail-row"><span className="detail-label">S3 Remarks</span><span className="detail-value">{selectedForm.s3BucketRemarks || '-'}</span></div>
+                        </>
+                      )}
                     </div>
 
                     {/* Section 3: Organization Details */}
