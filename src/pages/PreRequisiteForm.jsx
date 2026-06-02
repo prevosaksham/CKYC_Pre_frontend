@@ -1638,9 +1638,9 @@ const PreRequisiteForm = () => {
                                   <div className="d-flex align-items-center gap-2">
                                     <div>
                                       VM connected on Port <span className="text-danger">*</span><br />
-                                      <small className="text-muted">Port 5000</small>
+                                      <small className="text-muted">Interconnectivity on port 5000</small>
                                     </div>
-                                    <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip="Port 5000"></i>
+                                    <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip="Need interconnectivity for microservice"></i>
                                   </div>
                                 </td>
                                 <td>
@@ -3052,9 +3052,9 @@ const PreRequisiteForm = () => {
                                   <div className="d-flex align-items-center gap-2">
                                     <div>
                                       VM connected on Port <span className="text-danger">*</span><br />
-                                      <small className="text-muted">Port 5000</small>
+                                      <small className="text-muted">Interconnectivity on port 5000</small>
                                     </div>
-                                    <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip="Port 5000"></i>
+                                    <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip="Need interconnectivity for microservice"></i>
                                   </div>
                                 </td>
                                 <td>
