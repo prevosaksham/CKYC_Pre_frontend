@@ -447,6 +447,17 @@ const PreRequisiteForm = () => {
     prodDrRequiredStatus: '',
     prodDrRequiredRemarks: '',
 
+    prodVmPort5000Status: '',
+    prodVmPort5000Remarks: '',
+    prodSslRequiredStatus: '',
+    prodSslRequiredRemarks: '',
+    prodTwoIpsNatStatus: '',
+    prodTwoIpsNatRemarks: '',
+    prodOcrDependenciesStatus: '',
+    prodOcrDependenciesRemarks: '',
+    prodS3BucketStatus: '',
+    prodS3BucketRemarks: '',
+
     // PROD - Organization Details
     prodOrganizationName: '',
     prodOrganizationNameRemarks: '',
@@ -800,7 +811,9 @@ const PreRequisiteForm = () => {
   const handleNextProdInfra = () => {
     const requiredFields = [
       'prodHardwareProdStatus', 'prodOsNameVersion', 'prodInternetConnectivityStatus',
-      'prodDnsMappingStatus', 'prodPortStatus', 'prodFirewallStatus', 'prodRootAccessStatus'
+      'prodDnsMappingStatus', 'prodPortStatus', 'prodFirewallStatus', 'prodRootAccessStatus',
+      'prodVmPort5000Status', 'prodSslRequiredStatus', 'prodTwoIpsNatStatus',
+      'prodOcrDependenciesStatus', 'prodS3BucketStatus'
     ];
     const missing = requiredFields.some(field => !formData[field]);
     if (!isViewMode && missing) {
@@ -870,6 +883,11 @@ const PreRequisiteForm = () => {
       if (!formData.prodPortStatus) missingFields.push('Cross VM Connectivity (Ports)');
       if (!formData.prodFirewallStatus) missingFields.push('Firewall');
       if (!formData.prodRootAccessStatus) missingFields.push('Root Access');
+      if (!formData.prodVmPort5000Status) missingFields.push('VM connected on Port 5000');
+      if (!formData.prodSslRequiredStatus) missingFields.push('SSL Certificate Required');
+      if (!formData.prodTwoIpsNatStatus) missingFields.push('2 IP for API & SFTP');
+      if (!formData.prodOcrDependenciesStatus) missingFields.push('Need to install dependencies for OCR');
+      if (!formData.prodS3BucketStatus) missingFields.push('S3 Bucket/file server');
       if (!formData.prodOrganizationName?.trim()) missingFields.push('Organization Name');
       if (!formData.prodFiCodeOrgCode?.trim()) missingFields.push('FI Code / Org Code');
       if (!formData.prodRegionCode?.trim()) missingFields.push('Region Code');
@@ -1031,6 +1049,16 @@ const PreRequisiteForm = () => {
           timeSyncRemarks: formData.prodTimeSyncRemarks,
           drRequiredStatus: formData.prodDrRequiredStatus,
           drRequiredRemarks: formData.prodDrRequiredRemarks,
+          prodVmPort5000Status: formData.prodVmPort5000Status,
+          prodVmPort5000Remarks: formData.prodVmPort5000Remarks,
+          prodSslRequiredStatus: formData.prodSslRequiredStatus,
+          prodSslRequiredRemarks: formData.prodSslRequiredRemarks,
+          prodTwoIpsNatStatus: formData.prodTwoIpsNatStatus,
+          prodTwoIpsNatRemarks: formData.prodTwoIpsNatRemarks,
+          prodOcrDependenciesStatus: formData.prodOcrDependenciesStatus,
+          prodOcrDependenciesRemarks: formData.prodOcrDependenciesRemarks,
+          prodS3BucketStatus: formData.prodS3BucketStatus,
+          prodS3BucketRemarks: formData.prodS3BucketRemarks,
           // Organization
           organizationName: formData.prodOrganizationName,
           organizationNameRemarks: formData.prodOrganizationNameRemarks,
@@ -1391,7 +1419,7 @@ const PreRequisiteForm = () => {
                                <tr>
                                 <td>1</td>
                                 <td>
-                                  Hardware Requirements (UAT)<br />
+                                  Hardware Requirements (UAT) <span className="text-danger">**</span><br />
                                   <small className="text-muted">Recomended : 2 vCPUs / 16 GB RAM / 50 GB SSD (2 Servers)</small>
                                 </td>
                                 <td>
@@ -1764,6 +1792,10 @@ const PreRequisiteForm = () => {
                               </tr>
                             </tbody>
                           </table>
+                        </div>
+
+                        <div className="text-muted small mt-2 mb-3">
+                          <strong>Note:</strong> The infrastructure should be scalable, and the resources can be scaled up as and when required based on business and volume requirements.**
                         </div>
 
                         {formError && (
@@ -2801,29 +2833,60 @@ const PreRequisiteForm = () => {
                               <tr>
                                 <td>1</td>
                                 <td>
-                                  Hardware Requirements (Prod)<br />
-                                  <small className="text-muted">Recomended : 12 vCPUs / 32 GB RAM / 150 GB SSD (2 Servers)</small>
+                                  Hardware Requirements (Prod) <span className="text-danger">**</span><br />
+                                  <small className="text-muted">Recomended : 8 vCPUs / 32 GB RAM / 50 GB SSD (2 Servers)</small>
                                 </td>
                                 <td>
-                                  <select className="form-select" name="prodHardwareProdStatus" value={formData.prodHardwareProdStatus} onChange={handleChange} required={!isViewMode && activeTab === 'prod'}>
+                                  <select
+                                    className="form-select"
+                                    name="prodHardwareProdStatus"
+                                    value={formData.prodHardwareProdStatus}
+                                    onChange={handleChange}
+                                    required={!isViewMode && activeTab === 'prod'}
+                                  >
                                     <option value="">Select</option>
                                     <option value="Yes">Yes</option>
                                     <option value="No">No</option>
                                   </select>
                                 </td>
-                                <td><input className="form-control" name="prodHardwareProdRemarks" value={formData.prodHardwareProdRemarks} onChange={handleChange} placeholder="Remarks" /></td>
+                                <td>
+                                  <input
+                                    className="form-control"
+                                    name="prodHardwareProdRemarks"
+                                    value={formData.prodHardwareProdRemarks}
+                                    onChange={handleChange}
+                                    placeholder="Remarks"
+                                  />
+                                </td>
                               </tr>
                               <tr>
                                 <td>2</td>
-                                <td>OS Name & Version <span className="text-danger">*</span><br /><small className="text-muted">Ubuntu version 24 & above / RHEL version 9.7</small></td>
                                 <td>
-                                  <select className="form-select" name="prodOsNameVersion" value={formData.prodOsNameVersion} onChange={handleChange} required={!isViewMode && activeTab === 'prod'}>
+                                  OS Name & Version <span className="text-danger">*</span><br />
+                                  <small className="text-muted">Ubuntu version 24 & above / RHEL version 9.7</small>
+                                </td>
+                                <td>
+                                  <select
+                                    className="form-select"
+                                    name="prodOsNameVersion"
+                                    value={formData.prodOsNameVersion}
+                                    onChange={handleChange}
+                                    required={!isViewMode && activeTab === 'prod'}
+                                  >
                                     <option value="">Select</option>
                                     <option value="Ubuntu">Ubuntu</option>
                                     <option value="RHEL">RHEL</option>
                                   </select>
                                 </td>
-                                <td><input className="form-control" name="prodOsNameVersionRemarks" value={formData.prodOsNameVersionRemarks} onChange={handleChange} placeholder="Remarks" /></td>
+                                <td>
+                                  <input
+                                    className="form-control"
+                                    name="prodOsNameVersionRemarks"
+                                    value={formData.prodOsNameVersionRemarks}
+                                    onChange={handleChange}
+                                    placeholder="Remarks"
+                                  />
+                                </td>
                               </tr>
                               <tr>
                                 <td>3</td>
@@ -2834,13 +2897,27 @@ const PreRequisiteForm = () => {
                                   </div>
                                 </td>
                                 <td>
-                                  <select className="form-select" name="prodInternetConnectivityStatus" value={formData.prodInternetConnectivityStatus} onChange={handleChange} required={!isViewMode && activeTab === 'prod'}>
+                                  <select
+                                    className="form-select"
+                                    name="prodInternetConnectivityStatus"
+                                    value={formData.prodInternetConnectivityStatus}
+                                    onChange={handleChange}
+                                    required={!isViewMode && activeTab === 'prod'}
+                                  >
                                     <option value="">Select</option>
                                     <option value="Yes">Yes</option>
                                     <option value="No">No</option>
                                   </select>
                                 </td>
-                                <td><input className="form-control" name="prodInternetConnectivityRemarks" value={formData.prodInternetConnectivityRemarks} onChange={handleChange} placeholder="Remarks" /></td>
+                                <td>
+                                  <input
+                                    className="form-control"
+                                    name="prodInternetConnectivityRemarks"
+                                    value={formData.prodInternetConnectivityRemarks}
+                                    onChange={handleChange}
+                                    placeholder="Remarks"
+                                  />
+                                </td>
                               </tr>
                               <tr>
                                 <td>4</td>
@@ -2851,13 +2928,27 @@ const PreRequisiteForm = () => {
                                   </div>
                                 </td>
                                 <td>
-                                  <select className="form-select" name="prodDnsMappingStatus" value={formData.prodDnsMappingStatus} onChange={handleChange} required={!isViewMode && activeTab === 'prod'}>
+                                  <select
+                                    className="form-select"
+                                    name="prodDnsMappingStatus"
+                                    value={formData.prodDnsMappingStatus}
+                                    onChange={handleChange}
+                                    required={!isViewMode && activeTab === 'prod'}
+                                  >
                                     <option value="">Select</option>
                                     <option value="Yes">Yes</option>
                                     <option value="No">No</option>
                                   </select>
                                 </td>
-                                <td><input className="form-control" name="prodDnsMappingRemarks" value={formData.prodDnsMappingRemarks} onChange={handleChange} placeholder="Remarks" /></td>
+                                <td>
+                                  <input
+                                    className="form-control"
+                                    name="prodDnsMappingRemarks"
+                                    value={formData.prodDnsMappingRemarks}
+                                    onChange={handleChange}
+                                    placeholder="Remarks"
+                                  />
+                                </td>
                               </tr>
                               <tr>
                                 <td>5</td>
@@ -2868,70 +2959,257 @@ const PreRequisiteForm = () => {
                                   </div>
                                 </td>
                                 <td>
-                                  <select className="form-select" name="prodPortStatus" value={formData.prodPortStatus} onChange={handleChange} required={!isViewMode && activeTab === 'prod'}>
+                                  <select
+                                    className="form-select"
+                                    name="prodPortStatus"
+                                    value={formData.prodPortStatus}
+                                    onChange={handleChange}
+                                    required={!isViewMode && activeTab === 'prod'}
+                                  >
                                     <option value="">Select</option>
                                     <option value="Yes">Yes</option>
                                     <option value="No">No</option>
                                   </select>
                                 </td>
-                                <td><input className="form-control" name="prodPortRemarks" value={formData.prodPortRemarks} onChange={handleChange} placeholder="Remarks" /></td>
+                                <td>
+                                  <input
+                                    className="form-control"
+                                    name="prodPortRemarks"
+                                    value={formData.prodPortRemarks}
+                                    onChange={handleChange}
+                                    placeholder="Remarks"
+                                  />
+                                </td>
                               </tr>
                               <tr>
                                 <td>6</td>
                                 <td>
                                   <div className="d-flex align-items-center gap-2">
                                     <div>
-                                      Firewall<br />
-                                      <small className="text-muted">Open port 443 for public HTTPS access. Open port 80 publicly only for Let's Encrypt validation. If SSL is terminated at the Load Balancer, port 80 is used only for LB-to-VM forwarding and is not exposed to the public.</small>
+                                      Firewall <span className="text-danger">*</span><br />
+                                      <small className="text-muted">Port 443. Port 80 allow only when Load balancer is used</small>
                                     </div>
                                     <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip="Required ports allowed"></i>
                                   </div>
                                 </td>
                                 <td>
-                                  <select className="form-select" name="prodFirewallStatus" value={formData.prodFirewallStatus} onChange={handleChange} required={!isViewMode && activeTab === 'prod'}>
+                                  <select
+                                    className="form-select"
+                                    name="prodFirewallStatus"
+                                    value={formData.prodFirewallStatus}
+                                    onChange={handleChange}
+                                    required={!isViewMode && activeTab === 'prod'}
+                                  >
                                     <option value="">Select</option>
                                     <option value="Yes">Yes</option>
                                     <option value="No">No</option>
                                   </select>
                                 </td>
-                                <td><input className="form-control" name="prodFirewallRemarks" value={formData.prodFirewallRemarks} onChange={handleChange} placeholder="Remarks" /></td>
+                                <td>
+                                  <input
+                                    className="form-control"
+                                    name="prodFirewallRemarks"
+                                    value={formData.prodFirewallRemarks}
+                                    onChange={handleChange}
+                                    placeholder="Remarks"
+                                  />
+                                </td>
                               </tr>
                               <tr>
                                 <td>7</td>
                                 <td>
                                   <div className="d-flex align-items-center gap-2">
                                     <span>Root Access <span className="text-danger">*</span></span>
-                                    <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip="ROOT user access provided"></i>
+                                    <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip="Admin/Sudo access required"></i>
                                   </div>
                                 </td>
                                 <td>
-                                  <select className="form-select" name="prodRootAccessStatus" value={formData.prodRootAccessStatus} onChange={handleChange} required={!isViewMode && activeTab === 'prod'}>
+                                  <select
+                                    className="form-select"
+                                    name="prodRootAccessStatus"
+                                    value={formData.prodRootAccessStatus}
+                                    onChange={handleChange}
+                                    required={!isViewMode && activeTab === 'prod'}
+                                  >
                                     <option value="">Select</option>
                                     <option value="Yes">Yes</option>
                                     <option value="No">No</option>
                                   </select>
                                 </td>
-                                <td><input className="form-control" name="prodRootAccessRemarks" value={formData.prodRootAccessRemarks} onChange={handleChange} placeholder="Remarks" /></td>
+                                <td>
+                                  <input
+                                    className="form-control"
+                                    name="prodRootAccessRemarks"
+                                    value={formData.prodRootAccessRemarks}
+                                    onChange={handleChange}
+                                    placeholder="Remarks"
+                                  />
+                                </td>
                               </tr>
                               <tr>
                                 <td>8</td>
                                 <td>
                                   <div className="d-flex align-items-center gap-2">
-                                    <span>DR Required</span>
-                                    <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip="Disaster Recovery setup requirement"></i>
+                                    <div>
+                                      VM connected on Port <span className="text-danger">*</span><br />
+                                      <small className="text-muted">Port 5000</small>
+                                    </div>
+                                    <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip="Port 5000"></i>
                                   </div>
                                 </td>
                                 <td>
-                                  <select className="form-select" name="prodDrRequiredStatus" value={formData.prodDrRequiredStatus} onChange={handleChange}>
+                                  <select
+                                    className="form-select"
+                                    name="prodVmPort5000Status"
+                                    value={formData.prodVmPort5000Status}
+                                    onChange={handleChange}
+                                    required={!isViewMode && activeTab === 'prod'}
+                                  >
                                     <option value="">Select</option>
                                     <option value="Yes">Yes</option>
                                     <option value="No">No</option>
                                   </select>
                                 </td>
-                                <td><input className="form-control" name="prodDrRequiredRemarks" value={formData.prodDrRequiredRemarks} onChange={handleChange} placeholder="Remarks" /></td>
+                                <td>
+                                  <input
+                                    className="form-control"
+                                    name="prodVmPort5000Remarks"
+                                    value={formData.prodVmPort5000Remarks}
+                                    onChange={handleChange}
+                                    placeholder="Remarks"
+                                  />
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>9</td>
+                                <td>
+                                  <div className="d-flex align-items-center gap-2">
+                                    <span>SSL certificate required <span className="text-danger">*</span></span>
+                                    <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip="Required for secure HTTPS connection"></i>
+                                  </div>
+                                </td>
+                                <td>
+                                  <select
+                                    className="form-select"
+                                    name="prodSslRequiredStatus"
+                                    value={formData.prodSslRequiredStatus}
+                                    onChange={handleChange}
+                                    required={!isViewMode && activeTab === 'prod'}
+                                  >
+                                    <option value="">Select</option>
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                  </select>
+                                </td>
+                                <td>
+                                  <input
+                                    className="form-control"
+                                    name="prodSslRequiredRemarks"
+                                    value={formData.prodSslRequiredRemarks}
+                                    onChange={handleChange}
+                                    placeholder="Remarks"
+                                  />
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>10</td>
+                                <td>
+                                  <div className="d-flex align-items-center gap-2">
+                                    <span>2 IP for API & SFTP <span className="text-danger">*</span></span>
+                                    <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip="NAT Outbound IPs"></i>
+                                  </div>
+                                </td>
+                                <td>
+                                  <select
+                                    className="form-select"
+                                    name="prodTwoIpsNatStatus"
+                                    value={formData.prodTwoIpsNatStatus}
+                                    onChange={handleChange}
+                                    required={!isViewMode && activeTab === 'prod'}
+                                  >
+                                    <option value="">Select</option>
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                  </select>
+                                </td>
+                                <td>
+                                  <input
+                                    className="form-control"
+                                    name="prodTwoIpsNatRemarks"
+                                    value={formData.prodTwoIpsNatRemarks}
+                                    onChange={handleChange}
+                                    placeholder="Remarks"
+                                  />
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>11</td>
+                                <td>
+                                  <div className="d-flex align-items-center gap-2">
+                                    <span>Need to install dependencies for OCR <span className="text-danger">*</span></span>
+                                    <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip="If required"></i>
+                                  </div>
+                                </td>
+                                <td>
+                                  <select
+                                    className="form-select"
+                                    name="prodOcrDependenciesStatus"
+                                    value={formData.prodOcrDependenciesStatus}
+                                    onChange={handleChange}
+                                    required={!isViewMode && activeTab === 'prod'}
+                                  >
+                                    <option value="">Select</option>
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                  </select>
+                                </td>
+                                <td>
+                                  <input
+                                    className="form-control"
+                                    name="prodOcrDependenciesRemarks"
+                                    value={formData.prodOcrDependenciesRemarks}
+                                    onChange={handleChange}
+                                    placeholder="Remarks"
+                                  />
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>12</td>
+                                <td>
+                                  <div className="d-flex align-items-center gap-2">
+                                    <span>S3 Bucket/file server <span className="text-danger">*</span></span>
+                                    <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip="File storage"></i>
+                                  </div>
+                                </td>
+                                <td>
+                                  <select
+                                    className="form-select"
+                                    name="prodS3BucketStatus"
+                                    value={formData.prodS3BucketStatus}
+                                    onChange={handleChange}
+                                    required={!isViewMode && activeTab === 'prod'}
+                                  >
+                                    <option value="">Select</option>
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                  </select>
+                                </td>
+                                <td>
+                                  <input
+                                    className="form-control"
+                                    name="prodS3BucketRemarks"
+                                    value={formData.prodS3BucketRemarks}
+                                    onChange={handleChange}
+                                    placeholder="Remarks"
+                                  />
+                                </td>
                               </tr>
                             </tbody>
                           </table>
+                        </div>
+
+                        <div className="text-muted small mt-2 mb-3">
+                          <strong>Note:</strong> The infrastructure should be scalable, and the resources can be scaled up as and when required based on business and volume requirements.**
                         </div>
 
                         {formError && (
