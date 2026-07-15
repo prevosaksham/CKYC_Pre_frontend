@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { formAPI } from '../services/api';
+import { formAPI, faqAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
@@ -232,6 +232,149 @@ const customStyles = `
     transform: scale(1.02);
     box-shadow: 0 4px 15px rgba(0,0,0,0.15) !important;
   }
+  /* === Global Fluidity & Animations === */
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes modalSlideIn {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  /* Tab content transitions */
+  .tab-pane {
+    animation: slideIn 0.3s ease-out;
+  }
+  .nav-tabs .nav-link {
+    transition: color 0.25s ease, border-color 0.25s ease, background-color 0.25s ease !important;
+    border-radius: 6px 6px 0 0 !important;
+  }
+  .nav-tabs .nav-link.active {
+    font-weight: 600 !important;
+  }
+  .nav-pills .nav-link {
+    transition: color 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease !important;
+    border-radius: 8px !important;
+  }
+
+  /* Card & form entrance */
+  .card {
+    transition: box-shadow 0.3s ease;
+  }
+  .card:hover {
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08) !important;
+  }
+
+  /* Form control focus glow */
+  .form-control:focus {
+    border-color: #eb9200 !important;
+    box-shadow: 0 0 0 0.2rem rgba(235, 146, 0, 0.15) !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+  }
+
+  /* Table row hover */
+  .table tbody tr {
+    transition: background-color 0.15s ease;
+  }
+  .table tbody tr:hover {
+    background-color: rgba(235, 146, 0, 0.04);
+  }
+
+  /* Button press effect */
+  .btn {
+    transition: all 0.2s ease !important;
+  }
+  .btn:active {
+    transform: scale(0.97);
+  }
+
+  /* Modal animations */
+  .modal.show .modal-dialog {
+    animation: modalSlideIn 0.3s ease-out;
+  }
+  .modal.show {
+    animation: fadeIn 0.2s ease-out;
+  }
+
+  /* View mode banner */
+  .view-mode-banner {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 1px solid #dee2e6;
+    border-left: 4px solid #6c757d;
+    border-radius: 8px;
+    padding: 16px 20px;
+    animation: slideIn 0.4s ease-out;
+  }
+  .view-mode-icon {
+    width: 42px;
+    height: 42px;
+    background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  /* Smooth scroll for inner tab content */
+  .tab-content {
+    transition: min-height 0.3s ease;
+  }
+
+  /* Profile dropdown animation */
+  .profile-dropdown {
+    animation: slideIn 0.2s ease-out;
+  }
+
+  .faq-accordion .accordion-item {
+    margin-bottom: 10px;
+    border-radius: 8px !important;
+    overflow: hidden;
+    border: 1px solid #dee2e6;
+  }
+  .faq-accordion .accordion-button {
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 14px 20px;
+    gap: 10px;
+  }
+  .faq-accordion .accordion-button:not(.collapsed) {
+    background-color: #fff5e6;
+    color: #b37400;
+    box-shadow: none;
+  }
+  .faq-accordion .accordion-button::after {
+    transition: transform 0.3s ease;
+  }
+  .faq-accordion .accordion-body {
+    padding: 16px 20px;
+  }
+  .faq-accordion .faq-collapse-panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .faq-accordion .faq-collapse-panel.open {
+    grid-template-rows: 1fr;
+  }
+  .faq-accordion .faq-collapse-inner {
+    overflow: hidden;
+  }
+  .faq-question-no {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background-color: #eb9200;
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
 `;
 
 const PreRequisiteForm = () => {
@@ -244,7 +387,6 @@ const PreRequisiteForm = () => {
 
   const [activeTab, setActiveTab] = useState(envParam === 'prod' ? 'prod' : 'uat');
   const [activeInnerTab, setActiveInnerTab] = useState('infra');
-  const [showArchModal, setShowArchModal] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [showImportantNote, setShowImportantNote] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -252,6 +394,13 @@ const PreRequisiteForm = () => {
   const [formError, setFormError] = useState('');
   const [activeProdInnerTab, setActiveProdInnerTab] = useState('infra');
   const [tooltip, setTooltip] = useState({ show: false, text: '', x: 0, y: 0 });
+
+  // FAQ state
+  const [faqs, setFaqs] = useState([]);
+  const [faqLoading, setFaqLoading] = useState(false);
+  const [faqError, setFaqError] = useState('');
+  const [faqFetched, setFaqFetched] = useState(false);
+  const [openFaqIndex, setOpenFaqIndex] = useState(null);
 
   // Zoom Lightbox States
   const [zoomImageSrc, setZoomImageSrc] = useState(null);
@@ -828,6 +977,76 @@ const PreRequisiteForm = () => {
     setActiveProdInnerTab('org');
   };
 
+  // FAQ fetch handler - only fetches once
+  const fetchFaqs = async () => {
+    if (faqFetched) return;
+    setFaqLoading(true);
+    setFaqError('');
+    try {
+      const response = await faqAPI.getAll();
+      setFaqs(response.data.data || []);
+      setFaqFetched(true);
+    } catch (err) {
+      setFaqError('Failed to load FAQs. Please try again.');
+    } finally {
+      setFaqLoading(false);
+    }
+  };
+
+  const handleFaqInnerTab = (tabSetter) => {
+    tabSetter('faq');
+    fetchFaqs();
+  };
+
+  // Render a single answer block based on its type
+  const renderBlock = (block, index) => {
+    switch (block.type) {
+      case 'table':
+        return (
+          <div className="table-responsive mb-2" key={index}>
+            <table className="table table-bordered table-sm mb-0">
+              <thead className="table-light">
+                <tr>
+                  {(block.headers || []).map((h, i) => (
+                    <th key={i}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {(block.rows || []).map((row, ri) => (
+                  <tr key={ri}>
+                    {row.map((cell, ci) => (
+                      <td key={ci}>{cell}</td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        );
+      case 'bullet_list':
+        return (
+          <ul className="mb-2" key={index}>
+            {(block.items || []).map((item, i) => (
+              <li key={i}>{item}</li>
+            ))}
+          </ul>
+        );
+      case 'paragraph':
+      default:
+        return <p className="mb-2" key={index}>{block.text || ''}</p>;
+    }
+  };
+
+  // Render FAQ answer by iterating over its blocks
+  const renderFaqAnswer = (faq) => {
+    const blocks = faq.answer?.blocks;
+    if (!blocks || !Array.isArray(blocks)) {
+      return <p className="mb-0">{String(faq.answer || '')}</p>;
+    }
+    return blocks.map((block, index) => renderBlock(block, index));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -1220,14 +1439,14 @@ const PreRequisiteForm = () => {
           </div>
           <div className="card-body">
             {isViewMode && (
-              <div className="alert alert-light border shadow-sm mb-4 d-flex justify-content-between align-items-center">
+              <div className="view-mode-banner mb-4 d-flex justify-content-between align-items-center">
                 <div className="d-flex align-items-center">
-                  <div className="bg-primary text-white rounded-circle p-2 me-3">
-                    <i className="bi bi-eye"></i>
+                  <div className="view-mode-icon me-3">
+                    <i className="bi bi-eye-fill"></i>
                   </div>
                   <div>
-                    <h5 className="mb-0 fw-bold">View Mode</h5>
-                    <p className="mb-0 text-muted small">Viewing full document. All fields are read-only.</p>
+                    <h5 className="mb-0 fw-bold" style={{ fontSize: '1rem' }}>Read-Only View</h5>
+                    <p className="mb-0 text-muted" style={{ fontSize: '0.82rem' }}>You are viewing a submitted form. Fields cannot be edited.</p>
                   </div>
                 </div>
                 <div className="d-flex gap-2">
@@ -1310,11 +1529,20 @@ const PreRequisiteForm = () => {
                     </li>
                     <li className="nav-item" role="presentation">
                       <button
-                        className="nav-link"
+                        className={`nav-link ${activeInnerTab === 'arch' ? 'active' : ''}`}
                         type="button"
-                        onClick={() => setShowArchModal(true)}
+                        onClick={() => setActiveInnerTab('arch')}
                       >
                         <i className="bi bi-diagram-3 me-2"></i>Architecture
+                      </button>
+                    </li>
+                    <li className="nav-item" role="presentation">
+                      <button
+                        className={`nav-link ${activeInnerTab === 'faq' ? 'active' : ''}`}
+                        type="button"
+                        onClick={() => handleFaqInnerTab(setActiveInnerTab)}
+                      >
+                        <i className="bi bi-question-circle me-2"></i>FAQ
                       </button>
                     </li>
                   </ul>
@@ -2697,6 +2925,92 @@ const PreRequisiteForm = () => {
                         </div>
                       </div>
                     )}
+                    {/* Architecture Tab */}
+                    {activeInnerTab === 'arch' && (
+                      <div className="tab-pane fade show active">
+                        <h5 className="mb-4"><i className="bi bi-diagram-3 me-2"></i>System Architecture</h5>
+                        <div className="row">
+                          <div className="col-md-6 mb-3">
+                            <div className="card h-100">
+                              <div className="card-header bg-light">
+                                <i className="bi bi-image me-2"></i>Architecture Diagram 1
+                              </div>
+                              <div className="card-body text-center">
+                                <img
+                                  src={`${import.meta.env.BASE_URL}images/architecture1.svg?v=2`}
+                                  alt="Architecture Diagram 1"
+                                  className="img-fluid rounded clickable-arch-img"
+                                  style={{ maxHeight: '400px' }}
+                                  onClick={() => handleOpenZoom(`${import.meta.env.BASE_URL}images/architecture1.svg?v=2`, 'Architecture Diagram 1')}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                          <div className="col-md-6 mb-3">
+                            <div className="card h-100">
+                              <div className="card-header bg-light">
+                                <i className="bi bi-image me-2"></i>Architecture Diagram 2
+                              </div>
+                              <div className="card-body text-center">
+                                <img
+                                  src={`${import.meta.env.BASE_URL}images/architecture2.svg?v=2`}
+                                  alt="Architecture Diagram 2"
+                                  className="img-fluid rounded clickable-arch-img"
+                                  style={{ maxHeight: '400px' }}
+                                  onClick={() => handleOpenZoom(`${import.meta.env.BASE_URL}images/architecture2.svg?v=2`, 'Architecture Diagram 2')}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <p className="text-muted small mt-2"><i className="bi bi-info-circle me-1"></i>Click on a diagram to zoom in.</p>
+                      </div>
+                    )}
+                    {/* FAQ Tab */}
+                    {activeInnerTab === 'faq' && (
+                      <div className="tab-pane fade show active">
+                        <h5 className="mb-4"><i className="bi bi-question-circle me-2"></i>Frequently Asked Questions</h5>
+                        {faqLoading && (
+                          <div className="text-center py-5">
+                            <div className="spinner-border text-primary" role="status">
+                              <span className="visually-hidden">Loading...</span>
+                            </div>
+                            <p className="mt-2 text-muted">Loading FAQs...</p>
+                          </div>
+                        )}
+                        {faqError && (
+                          <div className="alert alert-danger">{faqError}</div>
+                        )}
+                        {!faqLoading && !faqError && faqs.length === 0 && faqFetched && (
+                          <div className="alert alert-info">No FAQs available at the moment.</div>
+                        )}
+                        {!faqLoading && faqs.length > 0 && (
+                          <div className="accordion faq-accordion" id="faqAccordionUat">
+                            {faqs.map((faq, index) => (
+                              <div className="accordion-item" key={faq.id || index}>
+                                <h2 className="accordion-header">
+                                  <button
+                                    className={`accordion-button ${openFaqIndex === index ? '' : 'collapsed'}`}
+                                    type="button"
+                                    onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
+                                  >
+                                    <span className="faq-question-no">{faq.questionNo || index + 1}</span>
+                                    {faq.question}
+                                  </button>
+                                </h2>
+                                <div className={`faq-collapse-panel ${openFaqIndex === index ? 'open' : ''}`}>
+                                  <div className="faq-collapse-inner">
+                                    <div className="accordion-body">
+                                      {renderFaqAnswer(faq)}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -2724,11 +3038,20 @@ const PreRequisiteForm = () => {
                     </li>
                     <li className="nav-item" role="presentation">
                       <button
-                        className="nav-link"
+                        className={`nav-link ${activeProdInnerTab === 'arch' ? 'active' : ''}`}
                         type="button"
-                        onClick={() => setShowArchModal(true)}
+                        onClick={() => setActiveProdInnerTab('arch')}
                       >
                         <i className="bi bi-diagram-3 me-2"></i>Architecture
+                      </button>
+                    </li>
+                    <li className="nav-item" role="presentation">
+                      <button
+                        className={`nav-link ${activeProdInnerTab === 'faq' ? 'active' : ''}`}
+                        type="button"
+                        onClick={() => handleFaqInnerTab(setActiveProdInnerTab)}
+                      >
+                        <i className="bi bi-question-circle me-2"></i>FAQ
                       </button>
                     </li>
                   </ul>
@@ -3653,74 +3976,100 @@ const PreRequisiteForm = () => {
                         </div>
                       </div>
                     )}
+                    {/* PROD Architecture Tab */}
+                    {activeProdInnerTab === 'arch' && (
+                      <div className="tab-pane fade show active">
+                        <h5 className="mb-4"><i className="bi bi-diagram-3 me-2"></i>System Architecture</h5>
+                        <div className="row">
+                          <div className="col-md-6 mb-3">
+                            <div className="card h-100">
+                              <div className="card-header bg-light">
+                                <i className="bi bi-image me-2"></i>Architecture Diagram 1
+                              </div>
+                              <div className="card-body text-center">
+                                <img
+                                  src={`${import.meta.env.BASE_URL}images/architecture1.svg?v=2`}
+                                  alt="Architecture Diagram 1"
+                                  className="img-fluid rounded clickable-arch-img"
+                                  style={{ maxHeight: '400px' }}
+                                  onClick={() => handleOpenZoom(`${import.meta.env.BASE_URL}images/architecture1.svg?v=2`, 'Architecture Diagram 1')}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                          <div className="col-md-6 mb-3">
+                            <div className="card h-100">
+                              <div className="card-header bg-light">
+                                <i className="bi bi-image me-2"></i>Architecture Diagram 2
+                              </div>
+                              <div className="card-body text-center">
+                                <img
+                                  src={`${import.meta.env.BASE_URL}images/architecture2.svg?v=2`}
+                                  alt="Architecture Diagram 2"
+                                  className="img-fluid rounded clickable-arch-img"
+                                  style={{ maxHeight: '400px' }}
+                                  onClick={() => handleOpenZoom(`${import.meta.env.BASE_URL}images/architecture2.svg?v=2`, 'Architecture Diagram 2')}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <p className="text-muted small mt-2"><i className="bi bi-info-circle me-1"></i>Click on a diagram to zoom in.</p>
+                      </div>
+                    )}
+                    {/* PROD FAQ Tab */}
+                    {activeProdInnerTab === 'faq' && (
+                      <div className="tab-pane fade show active">
+                        <h5 className="mb-4"><i className="bi bi-question-circle me-2"></i>Frequently Asked Questions</h5>
+                        {faqLoading && (
+                          <div className="text-center py-5">
+                            <div className="spinner-border text-primary" role="status">
+                              <span className="visually-hidden">Loading...</span>
+                            </div>
+                            <p className="mt-2 text-muted">Loading FAQs...</p>
+                          </div>
+                        )}
+                        {faqError && (
+                          <div className="alert alert-danger">{faqError}</div>
+                        )}
+                        {!faqLoading && !faqError && faqs.length === 0 && faqFetched && (
+                          <div className="alert alert-info">No FAQs available at the moment.</div>
+                        )}
+                        {!faqLoading && faqs.length > 0 && (
+                          <div className="accordion faq-accordion" id="faqAccordionProd">
+                            {faqs.map((faq, index) => (
+                              <div className="accordion-item" key={faq.id || index}>
+                                <h2 className="accordion-header">
+                                  <button
+                                    className={`accordion-button ${openFaqIndex === index ? '' : 'collapsed'}`}
+                                    type="button"
+                                    onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
+                                  >
+                                    <span className="faq-question-no">{faq.questionNo || index + 1}</span>
+                                    {faq.question}
+                                  </button>
+                                </h2>
+                                <div className={`faq-collapse-panel ${openFaqIndex === index ? 'open' : ''}`}>
+                                  <div className="faq-collapse-inner">
+                                    <div className="accordion-body">
+                                      {renderFaqAnswer(faq)}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
+
               </div>
             </form>
           </div>
         </div>
       </div>
-
-      {/* Architecture Modal */}
-      {showArchModal && (
-        <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-          <div className="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">
-                  <i className="bi bi-diagram-3 me-2"></i>System Architecture
-                </h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={() => setShowArchModal(false)}
-                ></button>
-              </div>
-              <div className="modal-body">
-                <div className="row">
-                  <div className="col-md-6 mb-3">
-                    <div className="card h-100">
-                      <div className="card-header bg-light">
-                        <i className="bi bi-image me-2"></i>Architecture Diagram 1
-                      </div>
-                      <div className="card-body text-center">
-                        <img
-                          src={`${import.meta.env.BASE_URL}images/architecture1.svg?v=2`}
-                          alt="Architecture Diagram 1"
-                          className="img-fluid rounded clickable-arch-img"
-                          style={{ maxHeight: '400px' }}
-                          onClick={() => handleOpenZoom(`${import.meta.env.BASE_URL}images/architecture1.svg?v=2`, 'Architecture Diagram 1')}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col-md-6 mb-3">
-                    <div className="card h-100">
-                      <div className="card-header bg-light">
-                        <i className="bi bi-image me-2"></i>Architecture Diagram 2
-                      </div>
-                      <div className="card-body text-center">
-                        <img
-                          src={`${import.meta.env.BASE_URL}images/architecture2.svg?v=2`}
-                          alt="Architecture Diagram 2"
-                          className="img-fluid rounded clickable-arch-img"
-                          style={{ maxHeight: '400px' }}
-                          onClick={() => handleOpenZoom(`${import.meta.env.BASE_URL}images/architecture2.svg?v=2`, 'Architecture Diagram 2')}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowArchModal(false)}>
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Important Note Modal */}
       {showImportantNote && (

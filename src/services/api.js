@@ -72,4 +72,18 @@ export const dashboardAPI = {
   deleteHealthConfig: (id) => api.delete(`/api/Dashboard/DeleteHealthConfig/${id}`),
 };
 
+// FAQ API (separate base URL)
+const FAQ_BASE_URL = import.meta.env.VITE_FAQ_API_URL || 'http://localhost:5001';
+
+const faqApi = axios.create({
+  baseURL: FAQ_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+export const faqAPI = {
+  getAll: () => faqApi.get('/api/faqs'),
+};
+
 export default api;
