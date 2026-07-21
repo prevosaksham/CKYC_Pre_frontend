@@ -180,8 +180,8 @@ const Home = () => {
         }
 
         .btn-primary {
-          background: white;
-          color: #667eea;
+          background: #00569d;
+          color: white;
         }
 
         .btn-primary:hover {

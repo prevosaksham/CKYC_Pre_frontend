@@ -5,9 +5,28 @@ import { useAuth } from '../context/AuthContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import logoImg from '../assets/logo.png';
+import RecordsTab from '../components/RecordsTab';
 
 // Add custom styles for better visibility and premium feel
 const customStyles = `
+  .view-mode .org-details-table th:nth-child(4),
+  .view-mode .org-details-table td:nth-child(4),
+  .view-mode .infra-table th:nth-child(3),
+  .view-mode .infra-table td:nth-child(3),
+  .view-mode .infra-table th:nth-child(4),
+  .view-mode .infra-table td:nth-child(4) {
+    display: none;
+  }
+
+  .view-mode input, .view-mode select, .view-mode textarea {
+    pointer-events: none !important;
+    background-color: #e9ecef !important;
+    color: #6c757d !important;
+  }
+  .view-mode .text-danger {
+    display: none !important;
+  }
+
   .form-select {
     cursor: pointer !important;
     border: 1px solid #ced4da !important;
@@ -16,28 +35,13 @@ const customStyles = `
     font-weight: 500 !important;
   }
   .form-select:hover {
-    border-color: #eb9200 !important;
+    border-color: #00569d !important;
     background-color: #ffffff !important;
   }
   .form-select:focus {
-    border-color: #eb9200 !important;
-    box-shadow: 0 0 0 0.25rem rgba(235, 146, 0, 0.25) !important;
+    border-color: #00569d !important;
+    box-shadow: 0 0 0 0.25rem rgba(0, 86, 157, 0.25) !important;
     outline: 0 !important;
-  }
-  .view-mode input, .view-mode select, .view-mode textarea {
-    pointer-events: none !important;
-    background-color: #e9ecef !important;
-    color: #6c757d !important;
-  }
-  .view-mode .infra-table th:nth-child(3), .view-mode .infra-table td:nth-child(3),
-  .view-mode .infra-table th:nth-child(4), .view-mode .infra-table td:nth-child(4) {
-    display: none;
-  }
-  .view-mode .org-table th:nth-child(4), .view-mode .org-table td:nth-child(4) {
-    display: none;
-  }
-  .view-mode .text-danger {
-    display: none !important;
   }
   .user-profile-section {
     position: relative;
@@ -59,7 +63,7 @@ const customStyles = `
   .user-avatar-sm {
     width: 32px;
     height: 32px;
-    background: linear-gradient(135deg, #eb9200 0%, #ffb347 100%);
+    background: linear-gradient(135deg, #00569d 0%, #0074d9 100%);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -78,7 +82,7 @@ const customStyles = `
     transition: color 0.2s;
   }
   .user-name-link-sm:hover {
-    color: #eb9200;
+    color: #00569d;
   }
   .profile-dropdown {
     position: absolute;
@@ -245,16 +249,60 @@ const customStyles = `
   .tab-pane {
     animation: slideIn 0.3s ease-out;
   }
+  .bg-primary {
+    background-color: #00569d !important;
+  }
   .nav-tabs .nav-link {
     transition: color 0.25s ease, border-color 0.25s ease, background-color 0.25s ease !important;
     border-radius: 6px 6px 0 0 !important;
+    color: #475569;
+  }
+  .nav-tabs .nav-link:hover {
+    color: #00569d;
+    border-color: #e2e8f0 #e2e8f0 #dee2e6;
   }
   .nav-tabs .nav-link.active {
     font-weight: 600 !important;
+    color: #00569d !important;
+    border-color: #dee2e6 #dee2e6 #fff !important;
   }
   .nav-pills .nav-link {
     transition: color 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease !important;
     border-radius: 8px !important;
+    color: #475569;
+  }
+  .nav-pills .nav-link:hover {
+    color: #00569d;
+    background-color: #e8f0fa;
+  }
+  .nav-pills .nav-link.active {
+    background-color: #00569d !important;
+    color: #fff !important;
+  }
+  .nav-pills .nav-item {
+    margin-right: 8px;
+  }
+  .nav-pills .nav-item:last-child {
+    margin-right: 0;
+  }
+  .btn-primary {
+    background-color: #00569d !important;
+    border-color: #00569d !important;
+  }
+  .btn-primary:hover {
+    background-color: #003f75 !important;
+    border-color: #003f75 !important;
+  }
+  .btn-outline-primary {
+    color: #00569d !important;
+    border-color: #00569d !important;
+  }
+  .btn-outline-primary:hover {
+    background-color: #00569d !important;
+    color: #fff !important;
+  }
+  .text-primary {
+    color: #00569d !important;
   }
 
   /* Card & form entrance */
@@ -267,8 +315,8 @@ const customStyles = `
 
   /* Form control focus glow */
   .form-control:focus {
-    border-color: #eb9200 !important;
-    box-shadow: 0 0 0 0.2rem rgba(235, 146, 0, 0.15) !important;
+    border-color: #00569d !important;
+    box-shadow: 0 0 0 0.2rem rgba(0, 86, 157, 0.15) !important;
     transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
   }
 
@@ -277,7 +325,7 @@ const customStyles = `
     transition: background-color 0.15s ease;
   }
   .table tbody tr:hover {
-    background-color: rgba(235, 146, 0, 0.04);
+    background-color: rgba(0, 86, 157, 0.04);
   }
 
   /* Button press effect */
@@ -298,17 +346,20 @@ const customStyles = `
 
   /* View mode banner */
   .view-mode-banner {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border: 1px solid #dee2e6;
-    border-left: 4px solid #6c757d;
+    background: linear-gradient(135deg, #e8f0fa 0%, #d4e4f7 100%);
+    border: 1px solid #b8d4ef;
+    border-left: 4px solid #00569d;
     border-radius: 8px;
     padding: 16px 20px;
     animation: slideIn 0.4s ease-out;
   }
+  .view-mode-banner h5 {
+    color: #00569d !important;
+  }
   .view-mode-icon {
     width: 42px;
     height: 42px;
-    background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+    background: linear-gradient(135deg, #00569d 0%, #0074d9 100%);
     border-radius: 12px;
     display: flex;
     align-items: center;
@@ -316,6 +367,46 @@ const customStyles = `
     color: white;
     font-size: 18px;
     flex-shrink: 0;
+  }
+
+
+  /* Inline note style — consistent across all sections */
+  .inline-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13.5px;
+    color: #374151;
+    border-left: 3px solid #00569d;
+    padding: 4px 0 4px 10px;
+    margin-bottom: 12px;
+  }
+  .inline-note i {
+    color: #00569d;
+    font-size: 14px;
+    margin-top: 1px;
+    flex-shrink: 0;
+  }
+  .inline-note a {
+    color: #00569d;
+    font-weight: 500;
+  }
+
+  /* Unified table header color across all tables */
+  .table-secondary, .table thead.table-secondary th {
+    background-color: #e8f0fa !important;
+    color: #1e293b !important;
+    font-weight: 600 !important;
+    border-color: #c5d8ef !important;
+  }
+
+  /* Customer & Project Details field label column */
+  .details-table td:first-child {
+    background-color: #f8fafc;
+    font-weight: 500;
+    color: #374151;
+    vertical-align: middle;
+    width: 30%;
   }
 
   /* Smooth scroll for inner tab content */
@@ -341,8 +432,8 @@ const customStyles = `
     gap: 10px;
   }
   .faq-accordion .accordion-button:not(.collapsed) {
-    background-color: #fff5e6;
-    color: #b37400;
+    background-color: #e8f0fa;
+    color: #00569d;
     box-shadow: none;
   }
   .faq-accordion .accordion-button::after {
@@ -369,7 +460,7 @@ const customStyles = `
     width: 26px;
     height: 26px;
     border-radius: 50%;
-    background-color: #eb9200;
+    background-color: #00569d;
     color: #fff;
     font-size: 0.8rem;
     font-weight: 700;
@@ -393,6 +484,7 @@ const PreRequisiteForm = () => {
   const [alertMessage, setAlertMessage] = useState({ type: '', message: '' });
   const [formError, setFormError] = useState('');
   const [activeProdInnerTab, setActiveProdInnerTab] = useState('infra');
+  const [activeArchInnerTab, setActiveArchInnerTab] = useState(null);
   const [tooltip, setTooltip] = useState({ show: false, text: '', x: 0, y: 0 });
 
   // FAQ state
@@ -946,8 +1038,8 @@ const PreRequisiteForm = () => {
   const handleNextUatInfra = () => {
     const requiredFields = [
       'hardwareUATStatus', 'osNameVersion', 'internetConnectivityStatus',
-      'dnsMappingStatus', 'portStatus', 'firewallStatus', 'rootAccessStatus',
-      'vmPort5000Status', 'sslRequiredStatus', 'twoIpsNatStatus',
+      'dnsMappingStatus', 'portStatus', /* 'firewallStatus', */ 'rootAccessStatus',
+      /* 'vmPort5000Status', */ 'sslRequiredStatus', 'twoIpsNatStatus',
       'ocrDependenciesStatus', 's3BucketStatus'
     ];
     const missing = requiredFields.some(field => !formData[field]);
@@ -963,8 +1055,8 @@ const PreRequisiteForm = () => {
   const handleNextProdInfra = () => {
     const requiredFields = [
       'prodHardwareProdStatus', 'prodOsNameVersion', 'prodInternetConnectivityStatus',
-      'prodDnsMappingStatus', 'prodPortStatus', 'prodFirewallStatus', 'prodRootAccessStatus',
-      'prodVmPort5000Status', 'prodSslRequiredStatus', 'prodTwoIpsNatStatus',
+      'prodDnsMappingStatus', 'prodPortStatus', /* 'prodFirewallStatus', */ 'prodRootAccessStatus',
+      /* 'prodVmPort5000Status', */ 'prodSslRequiredStatus', 'prodTwoIpsNatStatus',
       'prodOcrDependenciesStatus', 'prodS3BucketStatus'
     ];
     const missing = requiredFields.some(field => !formData[field]);
@@ -1049,6 +1141,7 @@ const PreRequisiteForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('submitting........')
 
     // Check acceptance based on active tab
     const isAccepted = activeTab === 'uat'
@@ -1060,8 +1153,10 @@ const PreRequisiteForm = () => {
       return;
     }
 
+
     // Skip validation and submission if in view mode
     if (isViewMode) return;
+
 
     // Validate mandatory fields based on active tab
     const missingFields = [];
@@ -1074,13 +1169,13 @@ const PreRequisiteForm = () => {
       if (!formData.internetConnectivityStatus) missingFields.push('Internet Connectivity');
       if (!formData.dnsMappingStatus) missingFields.push('Domain/DNS Mapping');
       if (!formData.portStatus) missingFields.push('Cross VM Connectivity (Ports)');
-      if (!formData.firewallStatus) missingFields.push('Firewall');
+      // if (!formData.firewallStatus) missingFields.push('Firewall');
       if (!formData.rootAccessStatus) missingFields.push('Root Access');
-      if (!formData.vmPort5000Status) missingFields.push('VM connected on Port 5000');
+      // if (!formData.vmPort5000Status) missingFields.push('VM connected on Port 5000');
       if (!formData.sslRequiredStatus) missingFields.push('SSL Certificate Required');
       if (!formData.twoIpsNatStatus) missingFields.push('2 IP for API & SFTP');
-      if (!formData.ocrDependenciesStatus) missingFields.push('Need to install dependencies for OCR');
-      if (!formData.s3BucketStatus) missingFields.push('S3 Bucket/file server');
+      if (!formData.ocrDependenciesStatus) missingFields.push('In-House OCR Required');
+      if (!formData.s3BucketStatus) missingFields.push('Object Storage (Bucket) Required');
       if (!formData.organizationName?.trim()) missingFields.push('Organization Name');
       if (!formData.fiCodeOrgCode?.trim()) missingFields.push('FI Code / Org Code');
       if (!formData.regionCode?.trim()) missingFields.push('Region Code');
@@ -1103,13 +1198,13 @@ const PreRequisiteForm = () => {
       if (!formData.prodInternetConnectivityStatus) missingFields.push('Internet Connectivity');
       if (!formData.prodDnsMappingStatus) missingFields.push('Domain/DNS Mapping');
       if (!formData.prodPortStatus) missingFields.push('Cross VM Connectivity (Ports)');
-      if (!formData.prodFirewallStatus) missingFields.push('Firewall');
+      // if (!formData.prodFirewallStatus) missingFields.push('Firewall');
       if (!formData.prodRootAccessStatus) missingFields.push('Root Access');
-      if (!formData.prodVmPort5000Status) missingFields.push('VM connected on Port 5000');
+      // if (!formData.prodVmPort5000Status) missingFields.push('VM connected on Port 5000');
       if (!formData.prodSslRequiredStatus) missingFields.push('SSL Certificate Required');
       if (!formData.prodTwoIpsNatStatus) missingFields.push('2 IP for API & SFTP');
-      if (!formData.prodOcrDependenciesStatus) missingFields.push('Need to install dependencies for OCR');
-      if (!formData.prodS3BucketStatus) missingFields.push('S3 Bucket/file server');
+      if (!formData.prodOcrDependenciesStatus) missingFields.push('In-House OCR Required');
+      if (!formData.prodS3BucketStatus) missingFields.push('Object Storage (Bucket) Required');
       if (!formData.prodOrganizationName?.trim()) missingFields.push('Organization Name');
       if (!formData.prodFiCodeOrgCode?.trim()) missingFields.push('FI Code / Org Code');
       if (!formData.prodRegionCode?.trim()) missingFields.push('Region Code');
@@ -1126,6 +1221,10 @@ const PreRequisiteForm = () => {
       if (!formData.prodTechnicalSPOCPhone?.trim()) missingFields.push('Technical SPOC Phone');
     }
 
+    console.log('submitting 2........')
+console.log('missing fields:', missingFields);
+
+
     if (missingFields.length > 0) {
       setAlertMessage({
         type: 'danger',
@@ -1136,6 +1235,7 @@ const PreRequisiteForm = () => {
 
     setLoading(true);
     setAlertMessage({ type: '', message: '' });
+
 
     try {
       let submitData;
@@ -1338,6 +1438,8 @@ const PreRequisiteForm = () => {
         };
       }
 
+
+
       if (formId) {
         await formAPI.update(formId, submitData);
         alert('Form updated successfully!');
@@ -1446,13 +1548,13 @@ const PreRequisiteForm = () => {
                   </div>
                   <div>
                     <h5 className="mb-0 fw-bold" style={{ fontSize: '1rem' }}>Read-Only View</h5>
-                    <p className="mb-0 text-muted" style={{ fontSize: '0.82rem' }}>You are viewing a submitted form. Fields cannot be edited.</p>
+                    <p className="mb-0 text-primary" style={{ fontSize: '0.82rem' }}>You are viewing a submitted form. Fields cannot be edited.</p>
                   </div>
                 </div>
                 <div className="d-flex gap-2">
                   <button
                     type="button"
-                    className="btn btn-outline-secondary btn-sm"
+                    className="btn bg-primary text-light btn-sm"
                     onClick={() => navigate('/ckycform/dashboard/forms')}
                   >
                     <i className="bi bi-arrow-left me-1"></i> Back to List
@@ -1524,7 +1626,7 @@ const PreRequisiteForm = () => {
                         type="button"
                         onClick={() => setActiveInnerTab('org')}
                       >
-                        <i className="bi bi-building-check me-2"></i>Org Onboarding
+                        <i className="bi bi-building-check me-2"></i>Organization Onboarding
                       </button>
                     </li>
                     <li className="nav-item" role="presentation">
@@ -1534,6 +1636,15 @@ const PreRequisiteForm = () => {
                         onClick={() => setActiveInnerTab('arch')}
                       >
                         <i className="bi bi-diagram-3 me-2"></i>Architecture
+                      </button>
+                    </li>
+                    <li className="nav-item" role="presentation">
+                      <button
+                        className={`nav-link ${activeInnerTab === 'records' ? 'active' : ''}`}
+                        type="button"
+                        onClick={() => setActiveInnerTab('records')}
+                      >
+                        <i className="bi bi-journal-text me-2"></i>Records
                       </button>
                     </li>
                     <li className="nav-item" role="presentation">
@@ -1553,9 +1664,11 @@ const PreRequisiteForm = () => {
                     {activeInnerTab === 'infra' && (
                       <div className="tab-pane fade show active">
                         {/* Section 1: Customer & Project Details */}
-                        <h5 className="mb-3">1. Customer & Project Details</h5>
+                        <h5 className="mb-3">
+                          <i className="bi bi-building me-2"></i>1. Customer & Project Details
+                        </h5>
                         <div className="table-responsive">
-                          <table className="table table-bordered">
+                          <table className="table table-bordered align-middle details-table">
                             <thead className="table-secondary">
                               <tr>
                                 <th style={{ width: '30%' }}>Field</th>
@@ -1572,6 +1685,7 @@ const PreRequisiteForm = () => {
                                     name="customerName"
                                     value={formData.customerName}
                                     onChange={handleAlphabeticChange}
+                                    placeholder="Enter customer / organization name"
                                     required={!isViewMode && activeTab === 'uat'}
                                   />
                                 </td>
@@ -1579,27 +1693,29 @@ const PreRequisiteForm = () => {
                               <tr>
                                 <td>Server Type</td>
                                 <td>
-                                  <div className="form-check form-check-inline">
-                                    <input
-                                      className="form-check-input"
-                                      type="radio"
-                                      name="serverType"
-                                      value="physical"
-                                      checked={formData.serverTypePhysical}
-                                      onChange={(e) => handleServerTypeChange(e)}
-                                    />
-                                    <label className="form-check-label">On-prem</label>
-                                  </div>
-                                  <div className="form-check form-check-inline">
-                                    <input
-                                      className="form-check-input"
-                                      type="radio"
-                                      name="serverType"
-                                      value="cloud"
-                                      checked={formData.serverTypeCloud}
-                                      onChange={(e) => handleServerTypeChange(e)}
-                                    />
-                                    <label className="form-check-label">Cloud</label>
+                                  <div className="d-flex gap-4 align-items-center" style={{ paddingTop: '2px' }}>
+                                    <div className="form-check mb-0">
+                                      <input
+                                        className="form-check-input"
+                                        type="radio"
+                                        name="serverType"
+                                        value="physical"
+                                        checked={formData.serverTypePhysical}
+                                        onChange={(e) => handleServerTypeChange(e)}
+                                      />
+                                      <label className="form-check-label">On-prem</label>
+                                    </div>
+                                    <div className="form-check mb-0">
+                                      <input
+                                        className="form-check-input"
+                                        type="radio"
+                                        name="serverType"
+                                        value="cloud"
+                                        checked={formData.serverTypeCloud}
+                                        onChange={(e) => handleServerTypeChange(e)}
+                                      />
+                                      <label className="form-check-label">Cloud</label>
+                                    </div>
                                   </div>
                                 </td>
                               </tr>
@@ -1612,6 +1728,7 @@ const PreRequisiteForm = () => {
                                     name="cloudDCProvider"
                                     value={formData.cloudDCProvider}
                                     onChange={handleAlphabeticChange}
+                                    placeholder="e.g. AWS, Azure"
                                   />
                                 </td>
                               </tr>
@@ -1621,6 +1738,7 @@ const PreRequisiteForm = () => {
                                   <input
                                     type="date"
                                     className="form-control"
+                                    style={{ maxWidth: '220px' }}
                                     name="dateOfAssessment"
                                     value={formData.dateOfAssessment}
                                     onChange={handleChange}
@@ -1639,8 +1757,8 @@ const PreRequisiteForm = () => {
                         <div className="table-responsive">
                           <table className="table table-bordered align-middle infra-table">
                             <thead className="table-secondary">
-                              <tr className="text-center align-middle">
-                                <th style={{ width: '5%' }}>#</th>
+                              <tr className="">
+                                <th style={{ width: '5%' }}>Sr.No</th>
                                 <th style={{ width: '45%' }}>Pre-Requisite Check</th>
                                 <th style={{ width: '15%' }}>Status</th>
                                 <th style={{ width: '35%' }}>Remarks</th>
@@ -1651,7 +1769,7 @@ const PreRequisiteForm = () => {
                                 <td>1</td>
                                 <td>
                                   Hardware Requirements (UAT) <span className="text-danger">**</span><br />
-                                  <small className="text-muted">Recomended : 2 vCPUs / 16 GB RAM / 50 GB SSD (2 Servers)</small>
+                                  <small className="text-muted">Recomended : 4 vCPUs / 16 GB RAM</small>
                                 </td>
                                 <td>
                                   <select
@@ -1741,7 +1859,7 @@ const PreRequisiteForm = () => {
                                 <td>
                                   <div className="d-flex align-items-center gap-2">
                                     <span>Domain <span className="text-danger">*</span></span>
-                                    <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip="Domain to Access the Application"></i>
+                                    <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip="The CKYC application requires a domain for access. It can also be hosted on an internal IP, with VPN access required."></i>
                                   </div>
                                 </td>
                                 <td>
@@ -1772,7 +1890,7 @@ const PreRequisiteForm = () => {
                                 <td>
                                   <div className="d-flex align-items-center gap-2">
                                     <span>Cross VM Connectivity <span className="text-danger">*</span></span>
-                                    <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip="Communication between VMs"></i>
+                                    <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip="Both servers should have bi-directional connectivity on ports 5000, 22, 80, and 443."></i>
                                   </div>
                                 </td>
                                 <td>
@@ -1798,7 +1916,7 @@ const PreRequisiteForm = () => {
                                   />
                                 </td>
                               </tr>
-                               <tr>
+                               {/* <tr>
                                 <td>6</td>
                                 <td>
                                   <div className="d-flex align-items-center gap-2">
@@ -1831,9 +1949,9 @@ const PreRequisiteForm = () => {
                                     placeholder="Remarks"
                                   />
                                 </td>
-                              </tr>
+                              </tr> */}
                               <tr>
-                                <td>7</td>
+                                <td>6</td>
                                 <td>
                                   <div className="d-flex align-items-center gap-2">
                                     <span>Root Access <span className="text-danger">*</span></span>
@@ -1863,7 +1981,7 @@ const PreRequisiteForm = () => {
                                   />
                                 </td>
                               </tr>
-                              <tr>
+                              {/* <tr>
                                 <td>8</td>
                                 <td>
                                   <div className="d-flex align-items-center gap-2">
@@ -1896,9 +2014,9 @@ const PreRequisiteForm = () => {
                                     placeholder="Remarks"
                                   />
                                 </td>
-                              </tr>
+                              </tr> */}
                               <tr>
-                                <td>9</td>
+                                <td>7</td>
                                 <td>
                                   <div className="d-flex align-items-center gap-2">
                                     <span>SSL certificate required <span className="text-danger">*</span></span>
@@ -1929,7 +2047,7 @@ const PreRequisiteForm = () => {
                                 </td>
                               </tr>
                               <tr>
-                                <td>10</td>
+                                <td>8</td>
                                 <td>
                                   <div className="d-flex align-items-center gap-2">
                                     <span>2 IP for API & SFTP <span className="text-danger">*</span></span>
@@ -1960,11 +2078,11 @@ const PreRequisiteForm = () => {
                                 </td>
                               </tr>
                               <tr>
-                                <td>11</td>
+                                <td>9</td>
                                 <td>
                                   <div className="d-flex align-items-center gap-2">
-                                    <span>Need to install dependencies for OCR <span className="text-danger">*</span></span>
-                                    <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip="If required"></i>
+                                    <span>In-House OCR Required <span className="text-danger">*</span></span>
+                                    <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip="In-House OCR is useful in Non-standard format of Aadhar cards"></i>
                                   </div>
                                 </td>
                                 <td>
@@ -1991,11 +2109,11 @@ const PreRequisiteForm = () => {
                                 </td>
                               </tr>
                               <tr>
-                                <td>12</td>
+                                <td>10</td>
                                 <td>
                                   <div className="d-flex align-items-center gap-2">
-                                    <span>S3 Bucket/file server <span className="text-danger">*</span></span>
-                                    <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip="File storage"></i>
+                                    <span>Object Storage (Bucket) Required <span className="text-danger">*</span></span>
+                                    <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip=" Used in excel upload of docs and storage of files, if not given then by-default is disk storage"></i>
                                   </div>
                                 </td>
                                 <td>
@@ -2025,8 +2143,9 @@ const PreRequisiteForm = () => {
                           </table>
                         </div>
 
-                        <div className="text-muted small mt-2 mb-3">
-                          <strong>Note:</strong> The infrastructure should be scalable, and the resources can be scaled up as and when required based on business and volume requirements.**
+                        <div className="inline-note mt-2">
+                          <i className="bi bi-info-circle-fill"></i>
+                          <span><strong>Note:</strong> The infrastructure should be scalable, and the resources can be scaled up as and when required based on business and volume requirements.**</span>
                         </div>
 
                         {formError && (
@@ -2054,15 +2173,19 @@ const PreRequisiteForm = () => {
                         {/* Section 3: Organization Details */}
                         <h5 className="mb-3"><i className="bi bi-building me-2"></i>3: Organization & CKYC Registration Details</h5>
                         <p className="text-muted mb-1">Purpose: Establish identity and CKYC-side mappings. All mandatory unless marked optional.</p>
-                        <p className="text-info mb-3 small">
-                          <strong>Note:</strong> To verify the details please login & verify. <br />
-                          <strong>UAT Domain:</strong> <a href="https://testbed.ckycindia.in/ckyc/index.php" target="_blank" rel="noopener noreferrer">https://testbed.ckycindia.in/ckyc/index.php</a>
-                        </p>
+                        <div className="inline-note">
+                          <i className="bi bi-info-circle-fill"></i>
+                          <span>
+                            <strong>Note:</strong> To verify the details please login &amp; verify.&nbsp;&nbsp;
+                            <strong>UAT Domain:</strong>&nbsp;
+                            <a href="https://testbed.ckycindia.in/ckyc/index.php" target="_blank" rel="noopener noreferrer">https://testbed.ckycindia.in/ckyc/index.php</a>
+                          </span>
+                        </div>
                         <div className="table-responsive mb-4">
-                          <table className="table table-bordered align-middle org-table">
+                          <table className="table table-bordered align-middle org-table org-details-table">
                             <thead className="table-secondary">
-                              <tr className="text-center">
-                                <th style={{ width: '5%' }}>#</th>
+                              <tr>
+                                <th style={{ width: '5%' }}>Sr.No</th>
                                 <th style={{ width: '25%' }}>Field</th>
                                 <th style={{ width: '35%' }}>Value</th>
                                 <th style={{ width: '35%' }}>Remarks</th>
@@ -2479,13 +2602,16 @@ const PreRequisiteForm = () => {
                         </h5>
                         <p className="text-muted mb-3">Purpose: Ensure correct CKYC environment and cryptographic readiness.</p>
 
-                        <p className="text-muted mb-1">Note: Please share the certificate to this mail ID : <a href="mailto:ps_sakshaml@proteantech.in">ps_sakshaml@proteantech.in</a></p>
+                        <div className="inline-note">
+                          <i className="bi bi-info-circle-fill"></i>
+                          <span><strong>Note:</strong> Please share the certificate to this mail ID: <a href="mailto:ps_sakshaml@proteantech.in">ps_sakshaml@proteantech.in</a></span>
+                        </div>
 
                         <div className="table-responsive mb-4">
-                          <table className="table table-bordered align-middle org-table">
+                          <table className="table table-bordered align-middle org-table org-details-table">
                             <thead className="table-secondary">
-                              <tr className="text-center">
-                                <th style={{ width: '5%' }}>#</th>
+                              <tr>
+                                <th style={{ width: '5%' }}>Sr.No</th>
                                 <th style={{ width: '25%' }}>Field</th>
                                 <th style={{ width: '35%' }}>Value</th>
                                 <th style={{ width: '35%' }}>Remarks</th>
@@ -2547,10 +2673,10 @@ const PreRequisiteForm = () => {
                         </h5>
                         <p className="text-muted mb-3">Purpose: Activated only if bulk operations are required.</p>
                         <div className="table-responsive mb-4">
-                          <table className="table table-bordered align-middle org-table">
+                          <table className="table table-bordered align-middle org-table org-details-table">
                             <thead className="table-secondary">
-                              <tr className="text-center">
-                                <th style={{ width: '5%' }}>#</th>
+                              <tr>
+                                <th style={{ width: '5%' }}>Sr.No</th>
                                 <th style={{ width: '25%' }}>Field</th>
                                 <th style={{ width: '35%' }}>Value</th>
                                 <th style={{ width: '35%' }}>Remarks</th>
@@ -2598,12 +2724,15 @@ const PreRequisiteForm = () => {
                           <i className="bi bi-globe me-2"></i>6: API & Microservice IP Whitelisting
                         </h5>
                         <p className="text-muted mb-1">Purpose: CERSAI firewall approval.</p>
-                        <p className="text-muted mb-3">Note: API and SFTP IP Should be different.</p>
+                        <div className="inline-note">
+                          <i className="bi bi-info-circle-fill"></i>
+                          <span><strong>Note:</strong> API and SFTP IP should be different.</span>
+                        </div>
                         <div className="table-responsive mb-4">
-                          <table className="table table-bordered align-middle org-table">
+                          <table className="table table-bordered align-middle org-table org-details-table">
                             <thead className="table-secondary">
-                              <tr className="text-center">
-                                <th style={{ width: '5%' }}>#</th>
+                              <tr>
+                                <th style={{ width: '5%' }}>Sr.No</th>
                                 <th style={{ width: '25%' }}>Field</th>
                                 <th style={{ width: '35%' }}>Value</th>
                                 <th style={{ width: '35%' }}>Remarks</th>
@@ -2715,8 +2844,8 @@ const PreRequisiteForm = () => {
                         <div className="table-responsive mb-4">
                           <table className="table table-bordered align-middle org-table">
                             <thead className="table-secondary">
-                              <tr className="text-center">
-                                <th style={{ width: '5%' }}>#</th>
+                              <tr>
+                                <th style={{ width: '5%' }} >Sr.No</th>
                                 <th style={{ width: '15%' }}>Role</th>
                                 <th style={{ width: '20%' }}>Name</th>
                                 <th style={{ width: '20%' }}>Email</th>
@@ -2833,7 +2962,7 @@ const PreRequisiteForm = () => {
                         <h5 className="mb-3">
                           <i className="bi bi-pen me-2"></i>Customer Confirmation & Sign-Off
                         </h5>
-                        <div className="alert alert-info d-flex justify-content-between align-items-center">
+                        <div className="table-secondary p-4 m-1 d-flex justify-content-between align-items-center">
                           <span>
                             I confirm that the above infrastructure and access prerequisites have been validated and are ready for deployment.
                             Any delays due to unmet prerequisites may impact project timelines.
@@ -2896,7 +3025,7 @@ const PreRequisiteForm = () => {
                         <div className="d-flex justify-content-between mt-4">
                           <button
                             type="button"
-                            className="btn btn-secondary"
+                            className="btn btn-primary"
                             onClick={() => setActiveInnerTab('infra')}
                           >
                             <i className="bi bi-arrow-left me-1"></i> Previous
@@ -2923,47 +3052,6 @@ const PreRequisiteForm = () => {
                             </div>
                           )}
                         </div>
-                      </div>
-                    )}
-                    {/* Architecture Tab */}
-                    {activeInnerTab === 'arch' && (
-                      <div className="tab-pane fade show active">
-                        <h5 className="mb-4"><i className="bi bi-diagram-3 me-2"></i>System Architecture</h5>
-                        <div className="row">
-                          <div className="col-md-6 mb-3">
-                            <div className="card h-100">
-                              <div className="card-header bg-light">
-                                <i className="bi bi-image me-2"></i>Architecture Diagram 1
-                              </div>
-                              <div className="card-body text-center">
-                                <img
-                                  src={`${import.meta.env.BASE_URL}images/architecture1.svg?v=2`}
-                                  alt="Architecture Diagram 1"
-                                  className="img-fluid rounded clickable-arch-img"
-                                  style={{ maxHeight: '400px' }}
-                                  onClick={() => handleOpenZoom(`${import.meta.env.BASE_URL}images/architecture1.svg?v=2`, 'Architecture Diagram 1')}
-                                />
-                              </div>
-                            </div>
-                          </div>
-                          <div className="col-md-6 mb-3">
-                            <div className="card h-100">
-                              <div className="card-header bg-light">
-                                <i className="bi bi-image me-2"></i>Architecture Diagram 2
-                              </div>
-                              <div className="card-body text-center">
-                                <img
-                                  src={`${import.meta.env.BASE_URL}images/architecture2.svg?v=2`}
-                                  alt="Architecture Diagram 2"
-                                  className="img-fluid rounded clickable-arch-img"
-                                  style={{ maxHeight: '400px' }}
-                                  onClick={() => handleOpenZoom(`${import.meta.env.BASE_URL}images/architecture2.svg?v=2`, 'Architecture Diagram 2')}
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <p className="text-muted small mt-2"><i className="bi bi-info-circle me-1"></i>Click on a diagram to zoom in.</p>
                       </div>
                     )}
                     {/* FAQ Tab */}
@@ -3011,6 +3099,63 @@ const PreRequisiteForm = () => {
                         )}
                       </div>
                     )}
+                    {/* Architecture Tab */}
+                    {activeInnerTab === 'arch' && (
+                      <div className="tab-pane fade show active">
+                        <h5 className="mb-4"><i className="bi bi-diagram-3 me-2"></i>System Architecture</h5>
+                        <div className="row mb-3">
+                          <div className="col-md-6 mb-3">
+                            <div className="card h-100">
+                              <div className="card-header bg-light d-flex justify-content-between align-items-center">
+                                <span><i className="bi bi-image me-2"></i>Architecture Diagram 1</span>
+                                <a
+                                  href={`${import.meta.env.BASE_URL}images/architecture1.png`}
+                                  download="Architecture-Diagram-1.png"
+                                  className="btn btn-sm btn-outline-primary"
+                                >
+                                  <i className="bi bi-download me-1"></i>Download
+                                </a>
+                              </div>
+                              <div className="card-body text-center">
+                                <img
+                                  src={`${import.meta.env.BASE_URL}images/architecture1.svg?v=2`}
+                                  alt="Architecture Diagram 1"
+                                  className="img-fluid rounded clickable-arch-img"
+                                  style={{ maxHeight: '400px' }}
+                                  onClick={() => handleOpenZoom(`${import.meta.env.BASE_URL}images/architecture1.svg?v=2`, 'Architecture Diagram 1')}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                          <div className="col-md-6 mb-3">
+                            <div className="card h-100">
+                              <div className="card-header bg-light d-flex justify-content-between align-items-center">
+                                <span><i className="bi bi-image me-2"></i>Architecture Diagram 2</span>
+                                <a
+                                  href={`${import.meta.env.BASE_URL}images/architecture2.png`}
+                                  download="Architecture-Diagram-2.png"
+                                  className="btn btn-sm btn-outline-primary"
+                                >
+                                  <i className="bi bi-download me-1"></i>Download
+                                </a>
+                              </div>
+                              <div className="card-body text-center">
+                                <img
+                                  src={`${import.meta.env.BASE_URL}images/architecture2.svg?v=2`}
+                                  alt="Architecture Diagram 2"
+                                  className="img-fluid rounded clickable-arch-img"
+                                  style={{ maxHeight: '400px' }}
+                                  onClick={() => handleOpenZoom(`${import.meta.env.BASE_URL}images/architecture2.svg?v=2`, 'Architecture Diagram 2')}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <p className="text-muted small"><i className="bi bi-info-circle me-1"></i>Click on a diagram to zoom in.</p>
+                      </div>
+                    )}
+                    {/* Records Tab */}
+                    {activeInnerTab === 'records' && <RecordsTab />}
                   </div>
                 </div>
 
@@ -3033,7 +3178,7 @@ const PreRequisiteForm = () => {
                         type="button"
                         onClick={() => setActiveProdInnerTab('org')}
                       >
-                        <i className="bi bi-building-check me-2"></i>Org Onboarding
+                        <i className="bi bi-building-check me-2"></i>Organization Onboarding
                       </button>
                     </li>
                     <li className="nav-item" role="presentation">
@@ -3043,6 +3188,15 @@ const PreRequisiteForm = () => {
                         onClick={() => setActiveProdInnerTab('arch')}
                       >
                         <i className="bi bi-diagram-3 me-2"></i>Architecture
+                      </button>
+                    </li>
+                    <li className="nav-item" role="presentation">
+                      <button
+                        className={`nav-link ${activeProdInnerTab === 'records' ? 'active' : ''}`}
+                        type="button"
+                        onClick={() => setActiveProdInnerTab('records')}
+                      >
+                        <i className="bi bi-journal-text me-2"></i>Records
                       </button>
                     </li>
                     <li className="nav-item" role="presentation">
@@ -3062,9 +3216,11 @@ const PreRequisiteForm = () => {
                     {activeProdInnerTab === 'infra' && (
                       <div className="tab-pane fade show active">
                         {/* Section 1: Customer & Project Details */}
-                        <h5 className="mb-3">1. Customer & Project Details</h5>
+                        <h5 className="mb-3">
+                          <i className="bi bi-building me-2"></i>1. Customer & Project Details
+                        </h5>
                         <div className="table-responsive">
-                          <table className="table table-bordered">
+                          <table className="table table-bordered align-middle details-table">
                             <thead className="table-secondary">
                               <tr>
                                 <th style={{ width: '30%' }}>Field</th>
@@ -3081,6 +3237,7 @@ const PreRequisiteForm = () => {
                                     name="prodCustomerName"
                                     value={formData.prodCustomerName}
                                     onChange={handleAlphabeticChange}
+                                    placeholder="Enter customer / organization name"
                                     required={!isViewMode && activeTab === 'prod'}
                                   />
                                 </td>
@@ -3088,27 +3245,29 @@ const PreRequisiteForm = () => {
                               <tr>
                                 <td>Server Type</td>
                                 <td>
-                                  <div className="form-check form-check-inline">
-                                    <input
-                                      className="form-check-input"
-                                      type="radio"
-                                      name="prodServerType"
-                                      value="physical"
-                                      checked={formData.prodServerTypePhysical}
-                                      onChange={(e) => handleServerTypeChange(e, 'prod')}
-                                    />
-                                    <label className="form-check-label">On-prem</label>
-                                  </div>
-                                  <div className="form-check form-check-inline">
-                                    <input
-                                      className="form-check-input"
-                                      type="radio"
-                                      name="prodServerType"
-                                      value="cloud"
-                                      checked={formData.prodServerTypeCloud}
-                                      onChange={(e) => handleServerTypeChange(e, 'prod')}
-                                    />
-                                    <label className="form-check-label">Cloud</label>
+                                  <div className="d-flex gap-4 align-items-center" style={{ paddingTop: '2px' }}>
+                                    <div className="form-check mb-0">
+                                      <input
+                                        className="form-check-input"
+                                        type="radio"
+                                        name="prodServerType"
+                                        value="physical"
+                                        checked={formData.prodServerTypePhysical}
+                                        onChange={(e) => handleServerTypeChange(e, 'prod')}
+                                      />
+                                      <label className="form-check-label">On-prem</label>
+                                    </div>
+                                    <div className="form-check mb-0">
+                                      <input
+                                        className="form-check-input"
+                                        type="radio"
+                                        name="prodServerType"
+                                        value="cloud"
+                                        checked={formData.prodServerTypeCloud}
+                                        onChange={(e) => handleServerTypeChange(e, 'prod')}
+                                      />
+                                      <label className="form-check-label">Cloud</label>
+                                    </div>
                                   </div>
                                 </td>
                               </tr>
@@ -3121,6 +3280,7 @@ const PreRequisiteForm = () => {
                                     name="prodCloudDCProvider"
                                     value={formData.prodCloudDCProvider}
                                     onChange={handleAlphabeticChange}
+                                    placeholder="e.g. AWS, Azure, NIC DC"
                                   />
                                 </td>
                               </tr>
@@ -3130,6 +3290,7 @@ const PreRequisiteForm = () => {
                                   <input
                                     type="date"
                                     className="form-control"
+                                    style={{ maxWidth: '220px' }}
                                     name="prodDateOfAssessment"
                                     value={formData.prodDateOfAssessment}
                                     onChange={handleChange}
@@ -3148,8 +3309,8 @@ const PreRequisiteForm = () => {
                         <div className="table-responsive">
                           <table className="table table-bordered align-middle infra-table">
                             <thead className="table-secondary">
-                              <tr className="text-center align-middle">
-                                <th style={{ width: '5%' }}>#</th>
+                              <tr>
+                                <th style={{ width: '5%' }} >Sr.No</th>
                                 <th style={{ width: '45%' }}>Pre-Requisite Check</th>
                                 <th style={{ width: '15%' }}>Status</th>
                                 <th style={{ width: '35%' }}>Remarks</th>
@@ -3250,7 +3411,7 @@ const PreRequisiteForm = () => {
                                 <td>
                                   <div className="d-flex align-items-center gap-2">
                                     <span>Domain <span className="text-danger">*</span></span>
-                                    <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip="Domain to Access the Application"></i>
+                                    <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip="The CKYC application requires a domain for access. It can also be hosted on an internal IP, with VPN access required."></i>
                                   </div>
                                 </td>
                                 <td>
@@ -3281,7 +3442,7 @@ const PreRequisiteForm = () => {
                                 <td>
                                   <div className="d-flex align-items-center gap-2">
                                     <span>Cross VM Connectivity <span className="text-danger">*</span></span>
-                                    <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip="Communication between VMs"></i>
+                                    <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip="Both servers should have bi-directional connectivity on ports 5000, 22, 80, and 443."></i>
                                   </div>
                                 </td>
                                 <td>
@@ -3307,6 +3468,7 @@ const PreRequisiteForm = () => {
                                   />
                                 </td>
                               </tr>
+                              {/* Firewall row commented out
                               <tr>
                                 <td>6</td>
                                 <td>
@@ -3341,8 +3503,9 @@ const PreRequisiteForm = () => {
                                   />
                                 </td>
                               </tr>
+                              */}
                               <tr>
-                                <td>7</td>
+                                <td>6</td>
                                 <td>
                                   <div className="d-flex align-items-center gap-2">
                                     <span>Root Access <span className="text-danger">*</span></span>
@@ -3372,6 +3535,7 @@ const PreRequisiteForm = () => {
                                   />
                                 </td>
                               </tr>
+                              {/* VM connected on Port row commented out
                               <tr>
                                 <td>8</td>
                                 <td>
@@ -3406,8 +3570,9 @@ const PreRequisiteForm = () => {
                                   />
                                 </td>
                               </tr>
+                              */}
                               <tr>
-                                <td>9</td>
+                                <td>7</td>
                                 <td>
                                   <div className="d-flex align-items-center gap-2">
                                     <span>SSL certificate required <span className="text-danger">*</span></span>
@@ -3438,7 +3603,7 @@ const PreRequisiteForm = () => {
                                 </td>
                               </tr>
                               <tr>
-                                <td>10</td>
+                                <td>8</td>
                                 <td>
                                   <div className="d-flex align-items-center gap-2">
                                     <span>2 IP for API & SFTP <span className="text-danger">*</span></span>
@@ -3469,11 +3634,11 @@ const PreRequisiteForm = () => {
                                 </td>
                               </tr>
                               <tr>
-                                <td>11</td>
+                                <td>9</td>
                                 <td>
                                   <div className="d-flex align-items-center gap-2">
-                                    <span>Need to install dependencies for OCR <span className="text-danger">*</span></span>
-                                    <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip="If required"></i>
+                                    <span>In-House OCR Required <span className="text-danger">*</span></span>
+                                    <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip="In-House OCR is useful in Non-standard format of Aadhar cards"></i>
                                   </div>
                                 </td>
                                 <td>
@@ -3500,11 +3665,11 @@ const PreRequisiteForm = () => {
                                 </td>
                               </tr>
                               <tr>
-                                <td>12</td>
+                                <td>10</td>
                                 <td>
                                   <div className="d-flex align-items-center gap-2">
-                                    <span>S3 Bucket/file server <span className="text-danger">*</span></span>
-                                    <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip="File storage"></i>
+                                    <span>Object Storage (Bucket) Required <span className="text-danger">*</span></span>
+                                    <i className="bi bi-info-circle-fill text-primary" style={{ cursor: 'pointer' }} onClick={handleInfoClick} onMouseEnter={handleInfoMouseEnter} onMouseLeave={handleInfoMouseLeave} data-tip=" Used in excel upload of docs and storage of files, if not given then by-default is disk storage"></i>
                                   </div>
                                 </td>
                                 <td>
@@ -3534,8 +3699,9 @@ const PreRequisiteForm = () => {
                           </table>
                         </div>
 
-                        <div className="text-muted small mt-2 mb-3">
-                          <strong>Note:</strong> The infrastructure should be scalable, and the resources can be scaled up as and when required based on business and volume requirements.**
+                        <div className="inline-note mt-2">
+                          <i className="bi bi-info-circle-fill"></i>
+                          <span><strong>Note:</strong> The infrastructure should be scalable, and the resources can be scaled up as and when required based on business and volume requirements.**</span>
                         </div>
 
                         {formError && (
@@ -3559,15 +3725,19 @@ const PreRequisiteForm = () => {
                         {/* Section 3: Organization Details */}
                         <h5 className="mb-3"><i className="bi bi-building me-2"></i>3: Organization & CKYC Registration Details</h5>
                         <p className="text-muted mb-1">Purpose: Establish identity and CKYC-side mappings. All mandatory unless marked optional.</p>
-                        <p className="text-info mb-3 small">
-                          <strong>Note:</strong> To verify the details please login & verify. <br />
-                          <strong>PROD Domain:</strong> <a href="https://www.ckycindia.in/ckyc/index.php" target="_blank" rel="noopener noreferrer">https://www.ckycindia.in/ckyc/index.php</a>
-                        </p>
+                        <div className="inline-note">
+                          <i className="bi bi-info-circle-fill"></i>
+                          <span>
+                            <strong>Note:</strong> To verify the details please login &amp; verify.&nbsp;&nbsp;
+                            <strong>PROD Domain:</strong>&nbsp;
+                            <a href="https://www.ckycindia.in/ckyc/index.php" target="_blank" rel="noopener noreferrer">https://www.ckycindia.in/ckyc/index.php</a>
+                          </span>
+                        </div>
                         <div className="table-responsive mb-4">
-                          <table className="table table-bordered align-middle org-table">
+                          <table className="table table-bordered align-middle org-table org-details-table">
                             <thead className="table-secondary">
-                              <tr className="text-center">
-                                <th style={{ width: '5%' }}>#</th>
+                              <tr>
+                                <th style={{ width: '5%' }} >Sr.No</th>
                                 <th style={{ width: '25%' }}>Field</th>
                                 <th style={{ width: '35%' }}>Value</th>
                                 <th style={{ width: '35%' }}>Remarks</th>
@@ -3747,13 +3917,16 @@ const PreRequisiteForm = () => {
                         {/* Section 4: Certificate Configuration */}
                         <h5 className="mb-3"><i className="bi bi-shield-lock me-2"></i>4: Certificate Configuration</h5>
                         <p className="text-muted mb-3">Purpose: Ensure correct CKYC environment and cryptographic readiness.</p>
-                        <p className="text-muted mb-1">Note: Please share the certificate to this mail ID : <a href="mailto:ps_sakshaml@proteantech.in">ps_sakshaml@proteantech.in</a></p>
+                        <div className="inline-note">
+                          <i className="bi bi-info-circle-fill"></i>
+                          <span><strong>Note:</strong> Please share the certificate to this mail ID: <a href="mailto:ps_sakshaml@proteantech.in">ps_sakshaml@proteantech.in</a></span>
+                        </div>
 
                         <div className="table-responsive mb-4">
-                          <table className="table table-bordered align-middle org-table">
+                          <table className="table table-bordered align-middle org-table org-details-table">
                             <thead className="table-secondary">
-                              <tr className="text-center">
-                                <th style={{ width: '5%' }}>#</th>
+                              <tr>
+                                <th style={{ width: '5%' }}>Sr.No</th>
                                 <th style={{ width: '25%' }}>Field</th>
                                 <th style={{ width: '35%' }}>Value</th>
                                 <th style={{ width: '35%' }}>Remarks</th>
@@ -3787,10 +3960,10 @@ const PreRequisiteForm = () => {
                         <h5 className="mb-3"><i className="bi bi-cloud-download me-2"></i>5: Bulk Download & SFTP Enablement</h5>
                         <p className="text-muted mb-3">Purpose: Activated only if bulk operations are required.</p>
                         <div className="table-responsive mb-4">
-                          <table className="table table-bordered align-middle org-table">
+                          <table className="table table-bordered align-middle org-table org-details-table">
                             <thead className="table-secondary">
-                              <tr className="text-center">
-                                <th style={{ width: '5%' }}>#</th>
+                              <tr>
+                                <th style={{ width: '5%' }}>Sr.No</th>
                                 <th style={{ width: '25%' }}>Field</th>
                                 <th style={{ width: '35%' }}>Value</th>
                                 <th style={{ width: '35%' }}>Remarks</th>
@@ -3822,12 +3995,15 @@ const PreRequisiteForm = () => {
                         {/* Section 6: API & IP Whitelisting */}
                         <h5 className="mb-3"><i className="bi bi-globe me-2"></i>6: API & Microservice IP Whitelisting</h5>
                         <p className="text-muted mb-1">Purpose: CERSAI firewall approval.</p>
-                        <p className="text-muted mb-3">Note: API and SFTP IP Should be different.</p>
+                        <div className="inline-note">
+                          <i className="bi bi-info-circle-fill"></i>
+                          <span><strong>Note:</strong> API and SFTP IP should be different.</span>
+                        </div>
                         <div className="table-responsive mb-4">
-                          <table className="table table-bordered align-middle org-table">
+                          <table className="table table-bordered align-middle org-table org-details-table">
                             <thead className="table-secondary">
-                              <tr className="text-center">
-                                <th style={{ width: '5%' }}>#</th>
+                              <tr>
+                                <th style={{ width: '5%' }} >Sr.No</th>
                                 <th style={{ width: '25%' }}>Field</th>
                                 <th style={{ width: '35%' }}>Value</th>
                                 <th style={{ width: '35%' }}>Remarks</th>
@@ -3887,8 +4063,8 @@ const PreRequisiteForm = () => {
                         <div className="table-responsive mb-4">
                           <table className="table table-bordered align-middle org-table">
                             <thead className="table-secondary">
-                              <tr className="text-center">
-                                <th style={{ width: '5%' }}>#</th>
+                              <tr>
+                                <th style={{ width: '5%' }} >Sr.No</th>
                                 <th style={{ width: '15%' }}>Role</th>
                                 <th style={{ width: '20%' }}>Name</th>
                                 <th style={{ width: '20%' }}>Email</th>
@@ -3931,7 +4107,7 @@ const PreRequisiteForm = () => {
 
                         {/* Customer Sign-Off */}
                         <h5 className="mb-3"><i className="bi bi-pen me-2"></i>Customer Confirmation & Sign-Off</h5>
-                        <div className="alert alert-info d-flex justify-content-between align-items-center">
+                        <div className="table-secondary p-4 m-1 d-flex justify-content-between align-items-center">
                           <span>
                             I confirm that the above infrastructure and access prerequisites have been validated and are ready for deployment.
                             Any delays due to unmet prerequisites may impact project timelines.
@@ -3961,7 +4137,7 @@ const PreRequisiteForm = () => {
                         </div>
 
                         <div className="d-flex justify-content-between mt-4">
-                          <button type="button" className="btn btn-secondary" onClick={() => setActiveProdInnerTab('infra')}>
+                          <button type="button" className="btn btn-primary" onClick={() => setActiveProdInnerTab('infra')}>
                             <i className="bi bi-arrow-left me-1"></i> Previous
                           </button>
                           {!isViewMode && (
@@ -3974,47 +4150,6 @@ const PreRequisiteForm = () => {
                             </div>
                           )}
                         </div>
-                      </div>
-                    )}
-                    {/* PROD Architecture Tab */}
-                    {activeProdInnerTab === 'arch' && (
-                      <div className="tab-pane fade show active">
-                        <h5 className="mb-4"><i className="bi bi-diagram-3 me-2"></i>System Architecture</h5>
-                        <div className="row">
-                          <div className="col-md-6 mb-3">
-                            <div className="card h-100">
-                              <div className="card-header bg-light">
-                                <i className="bi bi-image me-2"></i>Architecture Diagram 1
-                              </div>
-                              <div className="card-body text-center">
-                                <img
-                                  src={`${import.meta.env.BASE_URL}images/architecture1.svg?v=2`}
-                                  alt="Architecture Diagram 1"
-                                  className="img-fluid rounded clickable-arch-img"
-                                  style={{ maxHeight: '400px' }}
-                                  onClick={() => handleOpenZoom(`${import.meta.env.BASE_URL}images/architecture1.svg?v=2`, 'Architecture Diagram 1')}
-                                />
-                              </div>
-                            </div>
-                          </div>
-                          <div className="col-md-6 mb-3">
-                            <div className="card h-100">
-                              <div className="card-header bg-light">
-                                <i className="bi bi-image me-2"></i>Architecture Diagram 2
-                              </div>
-                              <div className="card-body text-center">
-                                <img
-                                  src={`${import.meta.env.BASE_URL}images/architecture2.svg?v=2`}
-                                  alt="Architecture Diagram 2"
-                                  className="img-fluid rounded clickable-arch-img"
-                                  style={{ maxHeight: '400px' }}
-                                  onClick={() => handleOpenZoom(`${import.meta.env.BASE_URL}images/architecture2.svg?v=2`, 'Architecture Diagram 2')}
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <p className="text-muted small mt-2"><i className="bi bi-info-circle me-1"></i>Click on a diagram to zoom in.</p>
                       </div>
                     )}
                     {/* PROD FAQ Tab */}
@@ -4062,6 +4197,226 @@ const PreRequisiteForm = () => {
                         )}
                       </div>
                     )}
+                    {/* PROD Architecture Tab */}
+                    {activeProdInnerTab === 'arch' && (
+                      <div className="tab-pane fade show active">
+                        <h5 className="mb-4"><i className="bi bi-diagram-3 me-2"></i>System Architecture</h5>
+                        <div className="row mb-3">
+                          <div className="col-md-6 mb-3">
+                            <div className="card h-100">
+                              <div className="card-header bg-light d-flex justify-content-between align-items-center">
+                                <span><i className="bi bi-image me-2"></i>Architecture Diagram 1</span>
+                                <a
+                                  href={`${import.meta.env.BASE_URL}images/architecture1.png`}
+                                  download="Architecture-Diagram-1.png"
+                                  className="btn btn-sm btn-outline-primary"
+                                >
+                                  <i className="bi bi-download me-1"></i>Download
+                                </a>
+                              </div>
+                              <div className="card-body text-center">
+                                <img
+                                  src={`${import.meta.env.BASE_URL}images/architecture1.svg?v=2`}
+                                  alt="Architecture Diagram 1"
+                                  className="img-fluid rounded clickable-arch-img"
+                                  style={{ maxHeight: '400px' }}
+                                  onClick={() => handleOpenZoom(`${import.meta.env.BASE_URL}images/architecture1.svg?v=2`, 'Architecture Diagram 1')}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                          <div className="col-md-6 mb-3">
+                            <div className="card h-100">
+                              <div className="card-header bg-light d-flex justify-content-between align-items-center">
+                                <span><i className="bi bi-image me-2"></i>Architecture Diagram 2</span>
+                                <a
+                                  href={`${import.meta.env.BASE_URL}images/architecture2.png`}
+                                  download="Architecture-Diagram-2.png"
+                                  className="btn btn-sm btn-outline-primary"
+                                >
+                                  <i className="bi bi-download me-1"></i>Download
+                                </a>
+                              </div>
+                              <div className="card-body text-center">
+                                <img
+                                  src={`${import.meta.env.BASE_URL}images/architecture2.svg?v=2`}
+                                  alt="Architecture Diagram 2"
+                                  className="img-fluid rounded clickable-arch-img"
+                                  style={{ maxHeight: '400px' }}
+                                  onClick={() => handleOpenZoom(`${import.meta.env.BASE_URL}images/architecture2.svg?v=2`, 'Architecture Diagram 2')}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <p className="text-muted small"><i className="bi bi-info-circle me-1"></i>Click on a diagram to zoom in.</p>
+                      </div>
+                    )}
+                    {/* PROD Records Tab */}
+                    {activeProdInnerTab === 'records' && <RecordsTab />}
+                  </div>
+                </div>
+
+                {/* Architecture Tab */}
+                <div className={`tab-pane fade ${activeTab === 'arch' ? 'show active' : ''}`}>
+                  {/* Architecture Inner Tabs */}
+                  <ul className="nav nav-pills mb-4" role="tablist">
+                    <li className="nav-item" role="presentation">
+                      <button
+                        className={`nav-link ${activeArchInnerTab === 'infra' ? 'active' : ''}`}
+                        type="button"
+                        onClick={() => setActiveArchInnerTab('infra')}
+                      >
+                        <i className="bi bi-hdd-network me-2"></i>Infra
+                      </button>
+                    </li>
+                    <li className="nav-item" role="presentation">
+                      <button
+                        className={`nav-link ${activeArchInnerTab === 'org' ? 'active' : ''}`}
+                        type="button"
+                        onClick={() => setActiveArchInnerTab('org')}
+                      >
+                        <i className="bi bi-building-check me-2"></i>Organization Onboarding
+                      </button>
+                    </li>
+                    <li className="nav-item" role="presentation">
+                      <button
+                        className={`nav-link ${activeArchInnerTab === 'records' ? 'active' : ''}`}
+                        type="button"
+                        onClick={() => setActiveArchInnerTab('records')}
+                      >
+                        <i className="bi bi-journal-text me-2"></i>Records
+                      </button>
+                    </li>
+                    <li className="nav-item" role="presentation">
+                      <button
+                        className={`nav-link ${activeArchInnerTab === 'faq' ? 'active' : ''}`}
+                        type="button"
+                        onClick={() => handleFaqInnerTab(setActiveArchInnerTab)}
+                      >
+                        <i className="bi bi-question-circle me-2"></i>FAQ
+                      </button>
+                    </li>
+                  </ul>
+
+                  {/* Architecture Inner Tab Content */}
+                  <div className="tab-content">
+                    {/* Default: show architecture diagrams when no inner tab is selected */}
+                    {activeArchInnerTab === null && (
+                      <div className="tab-pane fade show active">
+                        <h5 className="mb-4"><i className="bi bi-diagram-3 me-2"></i>System Architecture</h5>
+                        <div className="row mb-3">
+                          <div className="col-md-6 mb-3">
+                            <div className="card h-100">
+                              <div className="card-header bg-light d-flex justify-content-between align-items-center">
+                                <span><i className="bi bi-image me-2"></i>Architecture Diagram 1</span>
+                                <a
+                                  href={`${import.meta.env.BASE_URL}images/architecture1.png`}
+                                  download="Architecture-Diagram-1.png"
+                                  className="btn btn-sm btn-outline-primary"
+                                >
+                                  <i className="bi bi-download me-1"></i>Download
+                                </a>
+                              </div>
+                              <div className="card-body text-center">
+                                <img
+                                  src={`${import.meta.env.BASE_URL}images/architecture1.svg?v=2`}
+                                  alt="Architecture Diagram 1"
+                                  className="img-fluid rounded clickable-arch-img"
+                                  style={{ maxHeight: '400px' }}
+                                  onClick={() => handleOpenZoom(`${import.meta.env.BASE_URL}images/architecture1.svg?v=2`, 'Architecture Diagram 1')}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                          <div className="col-md-6 mb-3">
+                            <div className="card h-100">
+                              <div className="card-header bg-light d-flex justify-content-between align-items-center">
+                                <span><i className="bi bi-image me-2"></i>Architecture Diagram 2</span>
+                                <a
+                                  href={`${import.meta.env.BASE_URL}images/architecture2.png`}
+                                  download="Architecture-Diagram-2.png"
+                                  className="btn btn-sm btn-outline-primary"
+                                >
+                                  <i className="bi bi-download me-1"></i>Download
+                                </a>
+                              </div>
+                              <div className="card-body text-center">
+                                <img
+                                  src={`${import.meta.env.BASE_URL}images/architecture2.svg?v=2`}
+                                  alt="Architecture Diagram 2"
+                                  className="img-fluid rounded clickable-arch-img"
+                                  style={{ maxHeight: '400px' }}
+                                  onClick={() => handleOpenZoom(`${import.meta.env.BASE_URL}images/architecture2.svg?v=2`, 'Architecture Diagram 2')}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <p className="text-muted small"><i className="bi bi-info-circle me-1"></i>Click on a diagram to zoom in.</p>
+                      </div>
+                    )}
+                    {activeArchInnerTab === 'infra' && (
+                      <div className="tab-pane fade show active">
+                        <div className="inline-note">
+                          <i className="bi bi-info-circle me-2"></i>
+                          Please use the UAT or PROD tabs to fill in the Infrastructure checklist.
+                        </div>
+                      </div>
+                    )}
+                    {activeArchInnerTab === 'org' && (
+                      <div className="tab-pane fade show active">
+                        <div className="inline-note">
+                          <i className="bi bi-info-circle me-2"></i>
+                          Please use the UAT or PROD tabs to fill in the Organization Onboarding checklist.
+                        </div>
+                      </div>
+                    )}
+                    {activeArchInnerTab === 'records' && <RecordsTab />}
+                    {activeArchInnerTab === 'faq' && (
+                      <div className="tab-pane fade show active">
+                        <h5 className="mb-4"><i className="bi bi-question-circle me-2"></i>Frequently Asked Questions</h5>
+                        {faqLoading && (
+                          <div className="text-center py-5">
+                            <div className="spinner-border text-primary" role="status">
+                              <span className="visually-hidden">Loading...</span>
+                            </div>
+                            <p className="mt-2 text-muted">Loading FAQs...</p>
+                          </div>
+                        )}
+                        {faqError && (
+                          <div className="alert alert-danger">{faqError}</div>
+                        )}
+                        {!faqLoading && !faqError && faqs.length === 0 && faqFetched && (
+                          <div className="alert alert-info">No FAQs available at the moment.</div>
+                        )}
+                        {!faqLoading && faqs.length > 0 && (
+                          <div className="accordion faq-accordion" id="faqAccordionArch">
+                            {faqs.map((faq, index) => (
+                              <div className="accordion-item" key={faq.id || index}>
+                                <h2 className="accordion-header">
+                                  <button
+                                    className={`accordion-button ${openFaqIndex === index ? '' : 'collapsed'}`}
+                                    type="button"
+                                    onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
+                                  >
+                                    <span className="faq-question-no">{faq.questionNo || index + 1}</span>
+                                    {faq.question}
+                                  </button>
+                                </h2>
+                                <div className={`faq-collapse-panel ${openFaqIndex === index ? 'open' : ''}`}>
+                                  <div className="faq-collapse-inner">
+                                    <div className="accordion-body">
+                                      {renderFaqAnswer(faq)}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -4075,28 +4430,36 @@ const PreRequisiteForm = () => {
       {showImportantNote && (
         <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1060 }}>
           <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content">
-              <div className="modal-header bg-warning">
-                <h5 className="modal-title">
-                  <i className="bi bi-exclamation-triangle-fill me-2"></i>Important Note
+            <div className="modal-content" style={{ border: 'none', borderRadius: '10px', overflow: 'hidden' }}>
+              <div className="modal-header" style={{ background: '#00569d', borderBottom: 'none' }}>
+                <h5 className="modal-title text-white d-flex align-items-center gap-2">
+                  <i className="bi bi-exclamation-triangle-fill" style={{ color: '#ffc107' }}></i>
+                  Important Note
                 </h5>
                 <button
                   type="button"
-                  className="btn-close"
+                  className="btn-close btn-close-white"
                   onClick={() => setShowImportantNote(false)}
                 ></button>
               </div>
-              <div className="modal-body">
-                <div className="alert alert-danger mb-3">
-                  <h6 className="alert-heading"><i className="bi bi-exclamation-triangle-fill me-2"></i>CERSAI Registration Required</h6>
-                  <p className="mb-2"><strong>Organization Onboarding must be initiated before infrastructure deployment.</strong></p>
-                  <p className="mb-2">This process involves registration and validation with CERSAI, which typically takes <strong>10–15 working days</strong> to receive confirmation.</p>
-                  <p className="mb-0">Deployment activities can proceed only after CERSAI approval and submission of all required onboarding details.</p>
+              <div className="modal-body" style={{ padding: '24px' }}>
+                <div style={{ borderLeft: '4px solid #ffc107', paddingLeft: '16px' }}>
+                  <h6 className="fw-bold mb-2" style={{ color: '#1e293b' }}>
+                    <i className="bi bi-building me-2" style={{ color: '#00569d' }}></i>
+                    CERSAI Registration Required
+                  </h6>
+                  <p className="mb-2" style={{ fontSize: '14px', color: '#374151' }}>
+                    <strong>Organization Onboarding must be initiated before infrastructure deployment.</strong>
+                  </p>
+                  <p className="mb-2" style={{ fontSize: '14px', color: '#374151' }}>
+                    This process involves registration and validation with CERSAI, which typically takes <strong>10–15 working days</strong> to receive confirmation.
+                  </p>
+                  <p className="mb-0" style={{ fontSize: '14px', color: '#374151' }}>
+                    Deployment activities can proceed only after CERSAI approval and submission of all required onboarding details.
+                  </p>
                 </div>
-
-
               </div>
-              <div className="modal-footer">
+              <div className="modal-footer" style={{ borderTop: '1px solid #e2e8f0' }}>
                 <button type="button" className="btn btn-primary" onClick={() => setShowImportantNote(false)}>
                   <i className="bi bi-check-lg me-2"></i>I Understand, Continue
                 </button>

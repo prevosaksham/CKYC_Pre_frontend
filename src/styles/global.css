@@ -1,11 +1,11 @@
 :root {
   --sidebar-width: 260px;
-  --sidebar-bg: #1a1d21;
-  --sidebar-hover: #2d3238;
-  --sidebar-active: #3b82f6;
+  --sidebar-bg: #00345e;
+  --sidebar-hover: #004a85;
+  --sidebar-active: #4da6e8;
   --header-height: 60px;
   --text-muted: #8a8d91;
-  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --primary-gradient: linear-gradient(135deg, #00569d 0%, #003f75 100%);
   --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
   --warning-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
   --danger-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
@@ -204,13 +204,15 @@ body {
   padding: 10px 24px;
   border-radius: 8px;
   font-weight: 500;
+  text-decoration: none;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .btn-gradient:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 12px rgba(0, 86, 157, 0.4);
   color: white;
+  text-decoration: none;
 }
 
 /* Nav tabs custom */

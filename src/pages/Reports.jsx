@@ -212,7 +212,7 @@ const Reports = () => {
               {refreshing ? <span className="spinner-border spinner-border-sm"></span> : <i className="bi bi-arrow-repeat"></i>}
               Refresh All
             </button>
-            <button className="btn btn-primary btn-sm" onClick={() => handleOpenConfig()}>
+            <button className="btn btn-sm text-white" style={{ background: '#00569d' }} onClick={() => handleOpenConfig()}>
               <i className="bi bi-plus-lg me-1"></i> Add Client
             </button>
           </div>

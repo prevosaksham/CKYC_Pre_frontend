@@ -59,7 +59,7 @@ const Users = () => {
       <div className="dashboard-card">
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h5 className="mb-0 fw-bold">System Users</h5>
-          <button className="btn btn-primary btn-sm" onClick={fetchUsers}>
+          <button className="btn btn-sm text-white" style={{ backgroundColor: '#00569d' }} onClick={fetchUsers}>
             <i className="bi bi-arrow-clockwise me-1"></i> Refresh
           </button>
         </div>
@@ -81,7 +81,7 @@ const Users = () => {
             <table className="table custom-table">
               <thead>
                 <tr>
-                  <th style={{ width: '80px' }}>Sr No</th>
+                  <th>Sr.No</th>
                   <th>User</th>
                   <th>Organization Name</th>
                   <th>Mail ID</th>
@@ -95,7 +95,7 @@ const Users = () => {
                     <td>{index + 1}</td>
                     <td>
                       <div className="user-info">
-                        <div className="user-avatar">{getInitials(user.fullName)}</div>
+                        <div className="table-user-avatar">{getInitials(user.fullName)}</div>
                         <div>
                           <div className="fw-semibold">{user.fullName}</div>
                           <div className="text-muted small">{user.username}</div>
@@ -158,11 +158,11 @@ const Users = () => {
         }
 
         .custom-table thead th {
-          background-color: #f8f9fa;
+          background-color: #e8f0fa;
           padding: 12px 16px;
           font-weight: 600;
-          color: #4b5563;
-          border-bottom: 2px solid #e5e7eb;
+          color: #1e293b;
+          border-bottom: 2px solid #c5d8ef;
           white-space: nowrap;
           font-size: 14px;
         }
@@ -181,7 +181,7 @@ const Users = () => {
           gap: 12px;
         }
 
-        .user-avatar {
+        .table-user-avatar {
           width: 40px;
           height: 40px;
           background: #f3f4f6;

@@ -6,7 +6,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 
 const Dashboard = () => {
   const { user } = useAuth();
-  
+
   // Redirect normal users to their forms list
   if (user && !user.isAdmin) {
     return <Navigate to="/ckycform/dashboard/forms" replace />;
@@ -42,28 +42,28 @@ const Dashboard = () => {
       title: 'Total Forms',
       value: stats.total,
       icon: 'bi-file-earmark-check',
-      color: 'blue',
+      color: '#00569d',
       status: 'All'
     },
     {
       title: 'Approved Forms',
       value: stats.approved,
       icon: 'bi-check-circle',
-      color: 'green',
+      color: '#059669',
       status: 'Approved'
     },
     {
       title: 'Pending Forms',
       value: stats.pending,
       icon: 'bi-clock-history',
-      color: 'amber',
+      color: '#d97706',
       status: 'Pending'
     },
     {
       title: 'Rejected Forms',
       value: stats.rejected,
       icon: 'bi-x-circle',
-      color: 'red',
+      color: '#dc2626',
       status: 'Rejected'
     },
   ];
@@ -77,36 +77,38 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="dashboard-page fade-in-up">
+    <div className="dashboard-page">
       <div className="page-header">
-        <h1>Dashboard Overview</h1>
-        <Link to="/ckycform/form" className="btn-gradient">
-          <i className="bi bi-plus-lg"></i>
+        <div>
+          <h1>Dashboard Overview</h1>
+        </div>
+        <Link to="/ckycform/form" className="btn-new-form">
+          <i className="bi bi-plus-lg" style={{ marginRight: '6px' }}></i>
           New Form
         </Link>
       </div>
 
       <div className="stats-grid">
         {statsCards.map((card, index) => (
-          <Link 
-            key={index} 
+          <Link
+            key={index}
             to={card.status === 'All' ? '/ckycform/dashboard/forms' : `/ckycform/dashboard/forms?status=${card.status}`}
             className="stats-card"
           >
-            <div className="stats-content">
-              <div className={`icon-box ${card.color}`}>
+            <div className="stats-card-left" style={{ borderLeftColor: card.color }}>
+              <div className="stats-icon" style={{ color: card.color }}>
                 <i className={`bi ${card.icon}`}></i>
               </div>
               <div className="stats-info">
-                <h3>{card.value}</h3>
-                <p>{card.title}</p>
+                <span className="stats-value">{card.value}</span>
+                <span className="stats-label">{card.title}</span>
               </div>
             </div>
           </Link>
         ))}
       </div>
 
-      <div className="quick-actions">
+      <div className="quick-actions-section">
         <h2>Quick Actions</h2>
         <div className="actions-grid">
           <Link to="/ckycform/form" className="action-card">
@@ -138,21 +140,45 @@ const Dashboard = () => {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-bottom: 32px;
+          margin-bottom: 28px;
         }
 
         .page-header h1 {
-          font-size: 28px;
+          font-size: 22px;
           font-weight: 600;
-          color: #1f2937;
+          color: #1e293b;
           margin: 0;
+        }
+
+        .page-subtitle {
+          font-size: 13px;
+          color: #64748b;
+          margin: 4px 0 0;
+        }
+
+        .btn-new-form {
+          display: inline-flex;
+          align-items: center;
+          padding: 8px 20px;
+          background: #00569d;
+          color: white;
+          border-radius: 6px;
+          font-weight: 500;
+          font-size: 14px;
+          text-decoration: none;
+          transition: background 0.2s;
+        }
+
+        .btn-new-form:hover {
+          background: #003f75;
+          color: white;
         }
 
         .stats-grid {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
-          gap: 24px;
-          margin-bottom: 40px;
+          gap: 20px;
+          margin-bottom: 28px;
         }
 
         @media (max-width: 1200px) {
@@ -169,57 +195,93 @@ const Dashboard = () => {
 
         .stats-card {
           background: white;
-          border-radius: 12px;
+          border-radius: 18px;
           padding: 24px;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-          transition: all 0.2s;
           text-decoration: none;
           display: block;
-          cursor: pointer;
-        }
-        
-        .stats-card:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+          position: relative;
+          overflow: hidden;
+          box-shadow: 0 2px 12px rgba(0, 86, 157, 0.06);
+          border: 1px solid rgba(0, 86, 157, 0.08);
+          transition: box-shadow 0.2s, border-color 0.2s;
         }
 
-        .stats-content {
+        .stats-card::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(232,240,250,0.4) 100%);
+          pointer-events: none;
+        }
+
+        .stats-card::after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          height: 40px;
+          background: linear-gradient(180deg, transparent 0%, rgba(0, 86, 157, 0.03) 100%);
+          border-radius: 0 0 18px 18px;
+          pointer-events: none;
+        }
+
+        .stats-card:hover {
+          box-shadow: 0 3px 14px rgba(0, 86, 157, 0.09);
+          border-color: rgba(0, 86, 157, 0.12);
+        }
+
+        .stats-card-left {
           display: flex;
           align-items: center;
-          gap: 16px;
+          gap: 14px;
+          border-left: 3px solid;
+          padding-left: 14px;
+          position: relative;
+          z-index: 1;
         }
 
-        .stats-info h3 {
-          font-size: 32px;
+        .stats-icon {
+          font-size: 22px;
+          flex-shrink: 0;
+        }
+
+        .stats-info {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .stats-value {
+          font-size: 28px;
           font-weight: 700;
-          color: #1f2937;
-          margin: 0;
+          color: #1e293b;
+          line-height: 1.2;
         }
 
-        .stats-info p {
-          font-size: 14px;
-          color: #6b7280;
-          margin: 4px 0 0;
+        .stats-label {
+          font-size: 13px;
+          color: #64748b;
+          font-weight: 500;
         }
 
-        .quick-actions {
+        .quick-actions-section {
           background: white;
           border-radius: 12px;
           padding: 24px;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+          border: 1px solid #e2e8f0;
         }
 
-        .quick-actions h2 {
-          font-size: 18px;
+        .quick-actions-section h2 {
+          font-size: 16px;
           font-weight: 600;
-          color: #1f2937;
-          margin: 0 0 20px;
+          color: #1e293b;
+          margin: 0 0 18px;
         }
 
         .actions-grid {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
-          gap: 16px;
+          gap: 14px;
         }
 
         @media (max-width: 900px) {
@@ -233,28 +295,31 @@ const Dashboard = () => {
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          padding: 24px;
-          background: #f9fafb;
-          border-radius: 12px;
+          gap: 10px;
+          padding: 22px 16px;
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          border-radius: 10px;
           text-decoration: none;
           color: #374151;
-          transition: all 0.2s;
-          gap: 12px;
+          transition: border-color 0.2s, background 0.2s;
         }
 
         .action-card:hover {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
-          transform: translateY(-2px);
+          border-color: #00569d;
+          background: #e8f0fa;
+          color: #00569d;
         }
 
         .action-card i {
-          font-size: 28px;
+          font-size: 24px;
+          color: #00569d;
         }
 
         .action-card span {
           font-weight: 500;
-          font-size: 14px;
+          font-size: 13px;
+          text-align: center;
         }
 
         .loading-container {

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
@@ -7,6 +7,18 @@ const Header = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const dropdownRef = useRef(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleLogout = () => {
     const isAdmin = user?.isAdmin;
@@ -14,15 +26,26 @@ const Header = () => {
     navigate(isAdmin ? '/ckycform/login' : '/ckycform/user-login');
   };
 
+
+  const {pathname} = useLocation();
+
+  const pageTitles = {
+    '/ckycform/dashboard':'Dashboard',
+    '/ckycform/dashboard/forms':'Form List',
+    '/ckycform/dashboard/users':'Users List',
+  }
+
+  const pageTitle = pageTitles[pathname] || '';
+
   return (
     <header className="main-header">
       <div className="header-content">
         <div className="header-left">
-          <h1 className="page-title">Dashboard</h1>
+          <h1 className="page-title">{pageTitle}</h1>
         </div>
 
         <div className="header-right">
-          <div className="user-dropdown">
+          <div className="user-dropdown" ref={dropdownRef}>
             <div className="user-btn-group">
               <button
                 className="user-btn"
@@ -32,13 +55,9 @@ const Header = () => {
                   <i className="bi bi-person"></i>
                 </div>
               </button>
-              <Link 
-                to="/ckycform/dashboard/forms" 
-                className="user-name-link"
-                title="View My Forms"
-              >
-                {user?.fullName || 'Admin'}
-              </Link>
+              <span className="user-name-link">
+                {user?.fullName || ''}
+              </span>
               <button 
                 className="chevron-btn"
                 onClick={() => setShowDropdown(!showDropdown)}
@@ -105,15 +124,15 @@ const Header = () => {
           display: flex;
           align-items: center;
           background-color: #f8f9fa;
-          border: 1px solid #e5e7eb;
+          border: 1px solid #c5d8ef;
           border-radius: 50px;
-          padding: 4px;
+          padding: 3px;
           transition: all 0.2s;
         }
 
         .user-btn-group:hover {
           background-color: #f3f4f6;
-          border-color: #d1d5db;
+          border-color: #00569d;
         }
 
         .user-btn, .chevron-btn {
@@ -123,20 +142,20 @@ const Header = () => {
           align-items: center;
           justify-content: center;
           cursor: pointer;
-          color: #6b7280;
+          color: #00569d;
           padding: 4px 8px;
         }
 
         .user-avatar {
-          width: 32px;
-          height: 32px;
-          background: linear-gradient(135deg, #eb9200 0%, #ffb347 100%);
+          width: 28px;
+          height: 28px;
+          background: linear-gradient(135deg, #00569d 0%, #0074d9 100%);
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
           color: white;
-          font-size: 18px;
+          font-size: 14px;
         }
 
         .user-name-link {
@@ -151,7 +170,7 @@ const Header = () => {
         }
 
         .user-name-link:hover {
-          color: #eb9200;
+          color: #00569d;
         }
 
         .chevron-btn {

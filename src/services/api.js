@@ -50,7 +50,7 @@ export const authAPI = {
 
 // Form APIs
 export const formAPI = {
-  getAll: () => api.get('/api/Dashboard/GetAllForms'),
+  getAll: (environment) => api.get('/api/Dashboard/GetAllForms', { params: environment ? { environment } : {} }),
   getById: (id) => api.get(`/api/Dashboard/GetFormDetails/${id}`),
   submit: (data) => api.post('/api/Home/SubmitForm', data),
   updateStatus: (id, status) =>
@@ -73,7 +73,7 @@ export const dashboardAPI = {
 };
 
 // FAQ API (separate base URL)
-const FAQ_BASE_URL = import.meta.env.VITE_FAQ_API_URL || 'http://localhost:5001';
+const FAQ_BASE_URL = import.meta.env.VITE_FAQ_API_URL || import.meta.env.VITE_API_URL;
 
 const faqApi = axios.create({
   baseURL: FAQ_BASE_URL,

@@ -12,10 +12,15 @@ const FormList = () => {
   const [modalLoading, setModalLoading] = useState(false);
   const [updating, setUpdating] = useState(false);
   const [tooltip, setTooltip] = useState({ show: false, text: '', x: 0, y: 0 });
+  const [envTab, setEnvTab] = useState('All');
+  const [envCounts, setEnvCounts] = useState({ all: 0, UAT: 0, Production: 0 });
   const { user } = useAuth();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const statusFilter = searchParams.get('status');
+
+
+
 
   // Handler to show info icon tooltip on hover
   const handleInfoMouseEnter = (e) => {
@@ -54,15 +59,18 @@ const FormList = () => {
   };
 
   useEffect(() => {
-    fetchForms();
-  }, []);
+    fetchForms(envTab);
+  }, [envTab]);
 
-  const fetchForms = async () => {
+  const fetchForms = async (environment) => {
     setLoading(true);
     try {
-      const response = await formAPI.getAll();
+      const response = await formAPI.getAll(environment === 'All' ? '' : environment);
       if (response.data.success) {
         setForms(response.data.data);
+        if (response.data.counts) {
+          setEnvCounts(response.data.counts);
+        }
       }
     } catch (error) {
       console.error('Failed to fetch forms:', error);
@@ -100,7 +108,7 @@ const FormList = () => {
         alert(response.data.message);
         setShowModal(false);
         setSelectedForm(null);
-        fetchForms();
+        fetchForms(envTab);
       }
     } catch (error) {
       console.error('Failed to update status:', error);
@@ -119,7 +127,7 @@ const FormList = () => {
       const response = await formAPI.delete(formId);
       if (response.data.success) {
         alert('Form deleted successfully');
-        fetchForms();
+        fetchForms(envTab);
       }
     } catch (error) {
       console.error('Failed to delete form:', error);
@@ -168,7 +176,7 @@ const FormList = () => {
     if (status === 'Pass') return <span className="badge bg-success">Pass</span>;
     if (status === 'Fail') return <span className="badge bg-danger">Fail</span>;
     if (status === 'NA') return <span className="badge bg-secondary">N/A</span>;
-    return <span className="badge bg-secondary">-</span>;
+    return '-';
   };
 
   const getServerType = (selectedForm) => {
@@ -220,7 +228,7 @@ const FormList = () => {
       )}
 
       <div className="dashboard-card">
-        <div className="d-flex justify-content-between align-items-center mb-4">
+        <div className="d-flex justify-content-between align-items-center mb-3">
           <div>
             <h5 className="mb-0 fw-bold">All Pre-Requisite Forms</h5>
             {statusFilter && (
@@ -244,10 +252,26 @@ const FormList = () => {
             )}
           </div>
           {(!user || user.isAdmin || forms.length === 0) && (
-            <Link to="/ckycform/form" className="btn btn-primary btn-sm">
+            <Link to="/ckycform/form" className="btn btn-sm text-white" style={{ backgroundColor: '#00569d' }}>
               <i className="bi bi-plus-circle me-1"></i> New Form
             </Link>
           )}
+        </div>
+
+        <div className="env-tabs mb-4">
+          {[
+            { key: 'All', label: 'All' },
+            { key: 'UAT', label: 'UAT' },
+            { key: 'Production', label: 'PROD' },
+          ].map((tab) => (
+            <button
+              key={tab.key}
+              className={`env-tab ${envTab === tab.key ? 'active' : ''}`}
+              onClick={() => setEnvTab(tab.key)}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
 
         {forms.filter(f => !statusFilter || f.status === statusFilter).length === 0 ? (
@@ -260,7 +284,7 @@ const FormList = () => {
               }
             </p>
             {!statusFilter ? (
-              <Link to="/ckycform/form" className="btn btn-primary">
+              <Link to="/ckycform/form" className="btn-new-form">
                 <i className="bi bi-plus-circle me-1"></i> Create First Form
               </Link>
             ) : (
@@ -274,10 +298,10 @@ const FormList = () => {
           </div>
         ) : (
           <div className="table-responsive">
-            <table className="table table-hover" id="formsTable">
-              <thead className="table-light">
+            <table className="table" id="formsTable">
+              <thead>
                 <tr>
-                  <th>#</th>
+                  <th>Sr.No</th>
                   <th>Customer Name</th>
                   <th>Project Name</th>
                   <th>Environment</th>
@@ -300,7 +324,8 @@ const FormList = () => {
                     <td>
                       <div className="d-flex gap-2">
                         <button
-                          className="btn btn-primary btn-view"
+                          className="btn btn-sm text-white btn-view"
+                          style={{ backgroundColor: '#00569d' }}
                           onClick={() => handleViewDetails(form.id)}
                         >
                           <i className="bi bi-eye me-1"></i>View
@@ -357,155 +382,161 @@ const FormList = () => {
         <div className="modal-overlay" onClick={() => !modalLoading && setShowModal(false)}>
           <div className="modal-dialog modal-xl modal-dialog-scrollable" onClick={(e) => e.stopPropagation()}>
             <div className="modal-content">
-              <div className="modal-header bg-primary text-white">
-                <h5 className="modal-title">
-                  <i className="bi bi-file-earmark-text me-2"></i>Form Details
-                  {selectedForm && (
-                    <span className="ms-2">{getStatusBadge(selectedForm.status)}</span>
-                  )}
-                </h5>
-                <button
-                  type="button"
-                  className="btn-close btn-close-white"
-                  onClick={() => setShowModal(false)}
-                  disabled={modalLoading}
-                ></button>
+              <div className="modal-header-custom">
+                <div className="modal-header-top">
+                  <div className="modal-header-left">
+                    <h5 className="modal-title-custom">
+                      <i className="bi bi-file-earmark-text me-2"></i>Form Details
+                    </h5>
+                    {selectedForm && (
+                      <div className="modal-header-meta">
+                        {getStatusBadge(selectedForm.status)}
+                      </div>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    className="modal-close-btn"
+                    onClick={() => setShowModal(false)}
+                    disabled={modalLoading}
+                  >
+                    <i className="bi bi-x-lg"></i>
+                  </button>
+                </div>
+           
               </div>
               <div className="modal-body">
                 {modalLoading ? (
                   <div className="text-center py-5">
-                    <div className="spinner-border text-primary"></div>
-                    <p className="mt-2">Loading details...</p>
+                    <div className="spinner-border" style={{ color: '#00569d' }}></div>
+                    <p className="mt-2 text-muted">Loading details...</p>
                   </div>
                 ) : selectedForm ? (
                   <>
                     {/* Section 1: Customer & Project Details */}
                     <div className="detail-section">
                       <h6><i className="bi bi-building me-2"></i>Customer & Project Details</h6>
-                      <div className="detail-row"><span className="detail-label">Customer Name</span><span className="detail-value">{selectedForm.customerName || '-'}</span></div>
-                      <div className="detail-row"><span className="detail-label">Project Name</span><span className="detail-value">{selectedForm.projectName || '-'}</span></div>
-                      <div className="detail-row"><span className="detail-label">Environment</span><span className="detail-value">{selectedForm.ckycEnvironment ? <span className={`badge ${selectedForm.ckycEnvironment === 'UAT' ? 'bg-info' : 'bg-primary'}`}>{selectedForm.ckycEnvironment}</span> : '-'}</span></div>
-                      <div className="detail-row"><span className="detail-label">Server Type</span><span className="detail-value">{getServerType(selectedForm)}</span></div>
-                      <div className="detail-row"><span className="detail-label">Cloud/DC Provider</span><span className="detail-value">{selectedForm.cloudDCProvider || '-'}</span></div>
-                      <div className="detail-row"><span className="detail-label">Date of Assessment</span><span className="detail-value">{formatDate(selectedForm.dateOfAssessment)}</span></div>
-                      <div className="detail-row"><span className="detail-label">Submitted By</span><span className="detail-value">{selectedForm.creator?.fullName || '-'}</span></div>
-                      <div className="detail-row"><span className="detail-label">Submitted On</span><span className="detail-value">{formatDateTime(selectedForm.created_at)}</span></div>
+                      <div className="detail-grid">
+                        <div className="detail-item"><span className="detail-label">Customer Name</span><span className="detail-value">{selectedForm.customerName || '-'}</span></div>
+                        <div className="detail-item"><span className="detail-label">Project Name</span><span className="detail-value">{selectedForm.projectName || '-'}</span></div>
+                        <div className="detail-item"><span className="detail-label">Server Type</span><span className="detail-value">{getServerType(selectedForm)}</span></div>
+                        <div className="detail-item"><span className="detail-label">Cloud/DC Provider</span><span className="detail-value">{selectedForm.cloudDCProvider || '-'}</span></div>
+                        <div className="detail-item"><span className="detail-label">Date of Assessment</span><span className="detail-value">{formatDate(selectedForm.dateOfAssessment)}</span></div>
+                        <div className="detail-item"><span className="detail-label">Submitted By</span><span className="detail-value">{selectedForm.creator?.fullName || '-'}</span></div>
+                        <div className="detail-item"><span className="detail-label">Submitted On</span><span className="detail-value">{formatDateTime(selectedForm.created_at)}</span></div>
+                        <div className="detail-item"><span className="detail-label">Environment</span><span className="detail-value">{selectedForm.ckycEnvironment ? <span className="badge" style={{ background: selectedForm.ckycEnvironment === 'UAT' ? '#0ea5e9' : '#8b5cf6', padding: '5px 14px', fontSize: '12.5px', fontWeight: 500 }}>{selectedForm.ckycEnvironment}</span> : '-'}</span></div>
+                      </div>
                     </div>
 
                     {/* Section 2: Infrastructure Validation */}
                     <div className="detail-section">
                       <h6><i className="bi bi-hdd-network me-2"></i>Infrastructure Validation</h6>
-                      {selectedForm.ckycEnvironment === 'Production' ? (
-                        <>
-                          <div className="detail-row"><span className="detail-label">Hardware Requirements (Prod)</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.hardwareProdStatus)}</span></div>
-                          <div className="detail-row"><span className="detail-label">Hardware Remarks</span><span className="detail-value">{selectedForm.hardwareProdRemarks || '-'}</span></div>
-                          <div className="detail-row"><span className="detail-label">OS Name & Version</span><span className="detail-value">{selectedForm.prodOsNameVersion || '-'}</span></div>
-                          <div className="detail-row"><span className="detail-label">OS Remarks</span><span className="detail-value">{selectedForm.prodOsNameVersionRemarks || '-'}</span></div>
-                          <div className="detail-row"><span className="detail-label">Internet Connectivity</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.internetConnectivityStatus)}</span></div>
-                          <div className="detail-row"><span className="detail-label">Internet Remarks</span><span className="detail-value">{selectedForm.internetConnectivityRemarks || '-'}</span></div>
-                          <div className="detail-row"><span className="detail-label">Domain/DNS Mapping</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.dnsMappingStatus)}</span></div>
-                          <div className="detail-row"><span className="detail-label">Domain Remarks</span><span className="detail-value">{selectedForm.dnsMappingRemarks || '-'}</span></div>
-                          <div className="detail-row"><span className="detail-label">Cross VM Connectivity</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.port80443Status)}</span></div>
-                          <div className="detail-row"><span className="detail-label">Cross VM Remarks</span><span className="detail-value">{selectedForm.port80443Remarks || '-'}</span></div>
-                          <div className="detail-row"><span className="detail-label">Firewall</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.firewallStatus)}</span></div>
-                          <div className="detail-row"><span className="detail-label">Firewall Remarks</span><span className="detail-value">{selectedForm.firewallRemarks || '-'}</span></div>
-                          <div className="detail-row"><span className="detail-label">Root Access</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.rootAccessStatus)}</span></div>
-                          <div className="detail-row"><span className="detail-label">Root Access Remarks</span><span className="detail-value">{selectedForm.rootAccessRemarks || '-'}</span></div>
-                          <div className="detail-row"><span className="detail-label">VM connected on Port 5000</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.prodVmPort5000Status)}</span></div>
-                          <div className="detail-row"><span className="detail-label">Port 5000 Remarks</span><span className="detail-value">{selectedForm.prodVmPort5000Remarks || '-'}</span></div>
-                          <div className="detail-row"><span className="detail-label">SSL Certificate Required</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.prodSslRequiredStatus)}</span></div>
-                          <div className="detail-row"><span className="detail-label">SSL Remarks</span><span className="detail-value">{selectedForm.prodSslRequiredRemarks || '-'}</span></div>
-                          <div className="detail-row"><span className="detail-label">2 IP for API & SFTP</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.prodTwoIpsNatStatus)}</span></div>
-                          <div className="detail-row"><span className="detail-label">2 IP Remarks</span><span className="detail-value">{selectedForm.prodTwoIpsNatRemarks || '-'}</span></div>
-                          <div className="detail-row"><span className="detail-label">OCR Dependencies</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.prodOcrDependenciesStatus)}</span></div>
-                          <div className="detail-row"><span className="detail-label">OCR Remarks</span><span className="detail-value">{selectedForm.prodOcrDependenciesRemarks || '-'}</span></div>
-                          <div className="detail-row"><span className="detail-label">S3 Bucket/file server</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.prodS3BucketStatus)}</span></div>
-                          <div className="detail-row"><span className="detail-label">S3 Remarks</span><span className="detail-value">{selectedForm.prodS3BucketRemarks || '-'}</span></div>
-                        </>
-                      ) : (
-                        <>
-                          <div className="detail-row"><span className="detail-label">Hardware Requirements (UAT)</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.hardwareUATStatus)}</span></div>
-                          <div className="detail-row"><span className="detail-label">Hardware Remarks</span><span className="detail-value">{selectedForm.hardwareUATRemarks || '-'}</span></div>
-                          <div className="detail-row"><span className="detail-label">OS Name & Version</span><span className="detail-value">{selectedForm.osNameVersion || '-'}</span></div>
-                          <div className="detail-row"><span className="detail-label">OS Remarks</span><span className="detail-value">{selectedForm.osNameVersionRemarks || '-'}</span></div>
-                          <div className="detail-row"><span className="detail-label">Internet Connectivity</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.internetConnectivityStatus)}</span></div>
-                          <div className="detail-row"><span className="detail-label">Internet Remarks</span><span className="detail-value">{selectedForm.internetConnectivityRemarks || '-'}</span></div>
-                          <div className="detail-row"><span className="detail-label">Domain/DNS Mapping</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.dnsMappingStatus)}</span></div>
-                          <div className="detail-row"><span className="detail-label">Domain Remarks</span><span className="detail-value">{selectedForm.dnsMappingRemarks || '-'}</span></div>
-                          <div className="detail-row"><span className="detail-label">Cross VM Connectivity</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.port80443Status)}</span></div>
-                          <div className="detail-row"><span className="detail-label">Cross VM Remarks</span><span className="detail-value">{selectedForm.port80443Remarks || '-'}</span></div>
-                          <div className="detail-row"><span className="detail-label">Firewall</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.firewallStatus)}</span></div>
-                          <div className="detail-row"><span className="detail-label">Firewall Remarks</span><span className="detail-value">{selectedForm.firewallRemarks || '-'}</span></div>
-                          <div className="detail-row"><span className="detail-label">Root Access</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.rootAccessStatus)}</span></div>
-                          <div className="detail-row"><span className="detail-label">Root Access Remarks</span><span className="detail-value">{selectedForm.rootAccessRemarks || '-'}</span></div>
-                          <div className="detail-row"><span className="detail-label">VM connected on Port 5000</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.vmPort5000Status)}</span></div>
-                          <div className="detail-row"><span className="detail-label">Port 5000 Remarks</span><span className="detail-value">{selectedForm.vmPort5000Remarks || '-'}</span></div>
-                          <div className="detail-row"><span className="detail-label">SSL Certificate Required</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.sslRequiredStatus)}</span></div>
-                          <div className="detail-row"><span className="detail-label">SSL Remarks</span><span className="detail-value">{selectedForm.sslRequiredRemarks || '-'}</span></div>
-                          <div className="detail-row"><span className="detail-label">2 IP for API & SFTP</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.twoIpsNatStatus)}</span></div>
-                          <div className="detail-row"><span className="detail-label">2 IP Remarks</span><span className="detail-value">{selectedForm.twoIpsNatRemarks || '-'}</span></div>
-                          <div className="detail-row"><span className="detail-label">OCR Dependencies</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.ocrDependenciesStatus)}</span></div>
-                          <div className="detail-row"><span className="detail-label">OCR Remarks</span><span className="detail-value">{selectedForm.ocrDependenciesRemarks || '-'}</span></div>
-                          <div className="detail-row"><span className="detail-label">S3 Bucket/file server</span><span className="detail-value">{renderStatusBadgeInline(selectedForm.s3BucketStatus)}</span></div>
-                          <div className="detail-row"><span className="detail-label">S3 Remarks</span><span className="detail-value">{selectedForm.s3BucketRemarks || '-'}</span></div>
-                        </>
-                      )}
+                      <div className="infra-table">
+                        <div className="infra-table-header">
+                          <span>Check Point</span>
+                          <span>Status</span>
+                          <span>Remarks</span>
+                        </div>
+                        {selectedForm.ckycEnvironment === 'Production' ? (
+                          <>
+                            <div className="infra-table-row"><span>Hardware Requirements</span><span>{renderStatusBadgeInline(selectedForm.hardwareProdStatus)}</span><span>{selectedForm.hardwareProdRemarks || '-'}</span></div>
+                            <div className="infra-table-row"><span>OS Name & Version</span><span className="detail-value-text">{selectedForm.prodOsNameVersion || '-'}</span><span>{selectedForm.prodOsNameVersionRemarks || '-'}</span></div>
+                            <div className="infra-table-row"><span>Internet Connectivity</span><span>{renderStatusBadgeInline(selectedForm.internetConnectivityStatus)}</span><span>{selectedForm.internetConnectivityRemarks || '-'}</span></div>
+                            <div className="infra-table-row"><span>Domain/DNS Mapping</span><span>{renderStatusBadgeInline(selectedForm.dnsMappingStatus)}</span><span>{selectedForm.dnsMappingRemarks || '-'}</span></div>
+                            <div className="infra-table-row"><span>Cross VM Connectivity</span><span>{renderStatusBadgeInline(selectedForm.port80443Status)}</span><span>{selectedForm.port80443Remarks || '-'}</span></div>
+                            <div className="infra-table-row"><span>Firewall</span><span>{renderStatusBadgeInline(selectedForm.firewallStatus)}</span><span>{selectedForm.firewallRemarks || '-'}</span></div>
+                            <div className="infra-table-row"><span>Root Access</span><span>{renderStatusBadgeInline(selectedForm.rootAccessStatus)}</span><span>{selectedForm.rootAccessRemarks || '-'}</span></div>
+                            <div className="infra-table-row"><span>VM connected on Port 5000</span><span>{renderStatusBadgeInline(selectedForm.prodVmPort5000Status)}</span><span>{selectedForm.prodVmPort5000Remarks || '-'}</span></div>
+                            <div className="infra-table-row"><span>SSL Certificate Required</span><span>{renderStatusBadgeInline(selectedForm.prodSslRequiredStatus)}</span><span>{selectedForm.prodSslRequiredRemarks || '-'}</span></div>
+                            <div className="infra-table-row"><span>2 IP for API & SFTP</span><span>{renderStatusBadgeInline(selectedForm.prodTwoIpsNatStatus)}</span><span>{selectedForm.prodTwoIpsNatRemarks || '-'}</span></div>
+                            <div className="infra-table-row"><span>In-House OCR Required</span><span>{renderStatusBadgeInline(selectedForm.prodOcrDependenciesStatus)}</span><span>{selectedForm.prodOcrDependenciesRemarks || '-'}</span></div>
+                            <div className="infra-table-row"><span>Object Storage (Bucket)</span><span>{renderStatusBadgeInline(selectedForm.prodS3BucketStatus)}</span><span>{selectedForm.prodS3BucketRemarks || '-'}</span></div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="infra-table-row"><span>Hardware Requirements</span><span>{renderStatusBadgeInline(selectedForm.hardwareUATStatus)}</span><span>{selectedForm.hardwareUATRemarks || '-'}</span></div>
+                            <div className="infra-table-row"><span>OS Name & Version</span><span className="detail-value-text">{selectedForm.osNameVersion || '-'}</span><span>{selectedForm.osNameVersionRemarks || '-'}</span></div>
+                            <div className="infra-table-row"><span>Internet Connectivity</span><span>{renderStatusBadgeInline(selectedForm.internetConnectivityStatus)}</span><span>{selectedForm.internetConnectivityRemarks || '-'}</span></div>
+                            <div className="infra-table-row"><span>Domain/DNS Mapping</span><span>{renderStatusBadgeInline(selectedForm.dnsMappingStatus)}</span><span>{selectedForm.dnsMappingRemarks || '-'}</span></div>
+                            <div className="infra-table-row"><span>Cross VM Connectivity</span><span>{renderStatusBadgeInline(selectedForm.port80443Status)}</span><span>{selectedForm.port80443Remarks || '-'}</span></div>
+                            <div className="infra-table-row"><span>Firewall</span><span>{renderStatusBadgeInline(selectedForm.firewallStatus)}</span><span>{selectedForm.firewallRemarks || '-'}</span></div>
+                            <div className="infra-table-row"><span>Root Access</span><span>{renderStatusBadgeInline(selectedForm.rootAccessStatus)}</span><span>{selectedForm.rootAccessRemarks || '-'}</span></div>
+                            <div className="infra-table-row"><span>VM connected on Port 5000</span><span>{renderStatusBadgeInline(selectedForm.vmPort5000Status)}</span><span>{selectedForm.vmPort5000Remarks || '-'}</span></div>
+                            <div className="infra-table-row"><span>SSL Certificate Required</span><span>{renderStatusBadgeInline(selectedForm.sslRequiredStatus)}</span><span>{selectedForm.sslRequiredRemarks || '-'}</span></div>
+                            <div className="infra-table-row"><span>2 IP for API & SFTP</span><span>{renderStatusBadgeInline(selectedForm.twoIpsNatStatus)}</span><span>{selectedForm.twoIpsNatRemarks || '-'}</span></div>
+                            <div className="infra-table-row"><span>In-House OCR Required</span><span>{renderStatusBadgeInline(selectedForm.ocrDependenciesStatus)}</span><span>{selectedForm.ocrDependenciesRemarks || '-'}</span></div>
+                            <div className="infra-table-row"><span>Object Storage (Bucket)</span><span>{renderStatusBadgeInline(selectedForm.s3BucketStatus)}</span><span>{selectedForm.s3BucketRemarks || '-'}</span></div>
+                          </>
+                        )}
+                      </div>
                     </div>
 
                     {/* Section 3: Organization Details */}
                     <div className="detail-section">
                       <h6><i className="bi bi-building-check me-2"></i>Organization Onboarding</h6>
-                      <div className="detail-row"><span className="detail-label">Organization Name</span><span className="detail-value">{selectedForm.organizationName || '-'}</span></div>
-                      <div className="detail-row"><span className="detail-label">FI Code</span><span className="detail-value">{selectedForm.fiCode || '-'}</span></div>
-                      <div className="detail-row"><span className="detail-label">Region Code</span><span className="detail-value">{selectedForm.regionCode || '-'}</span></div>
-                      <div className="detail-row"><span className="detail-label">Branch Code</span><span className="detail-value">{selectedForm.branchCode || '-'}</span></div>
-                      <div className="detail-row"><span className="detail-label">KYC Branch</span><span className="detail-value">{selectedForm.kycBranch || '-'}</span></div>
-                      <div className="detail-row"><span className="detail-label">Verifier Name</span><span className="detail-value">{selectedForm.verifierName || '-'}</span></div>
-                      <div className="detail-row"><span className="detail-label">Employee Code</span><span className="detail-value">{selectedForm.employeeCode || '-'}</span></div>
-                      <div className="detail-row"><span className="detail-label">Designation</span><span className="detail-value">{selectedForm.designation || '-'}</span></div>
+                      <div className="detail-grid">
+                        <div className="detail-item"><span className="detail-label">Organization Name</span><span className="detail-value">{selectedForm.organizationName || '-'}</span></div>
+                        <div className="detail-item"><span className="detail-label">FI Code</span><span className="detail-value">{selectedForm.fiCode || '-'}</span></div>
+                        <div className="detail-item"><span className="detail-label">Region Code</span><span className="detail-value">{selectedForm.regionCode || '-'}</span></div>
+                        <div className="detail-item"><span className="detail-label">Branch Code</span><span className="detail-value">{selectedForm.branchCode || '-'}</span></div>
+                        <div className="detail-item"><span className="detail-label">KYC Branch</span><span className="detail-value">{selectedForm.kycBranch || '-'}</span></div>
+                        <div className="detail-item"><span className="detail-label">Verifier Name</span><span className="detail-value">{selectedForm.verifierName || '-'}</span></div>
+                        <div className="detail-item"><span className="detail-label">Employee Code</span><span className="detail-value">{selectedForm.employeeCode || '-'}</span></div>
+                        <div className="detail-item"><span className="detail-label">Designation</span><span className="detail-value">{selectedForm.designation || '-'}</span></div>
+                      </div>
                     </div>
 
-                    {/* Section 4: Maker/Checker & SFTP */}
+                    {/* Section 4: Credentials & SFTP */}
                     <div className="detail-section">
                       <h6><i className="bi bi-shield-lock me-2"></i>Credentials & SFTP</h6>
-                      <div className="detail-row"><span className="detail-label">Maker User ID</span><span className="detail-value">{selectedForm.makerUserId || '-'}</span></div>
-                      <div className="detail-row"><span className="detail-label">Checker User ID</span><span className="detail-value">{selectedForm.checkerUserId || '-'}</span></div>
-                      <div className="detail-row"><span className="detail-label">SFTP URL</span><span className="detail-value">{selectedForm.sftpUrl || '-'}</span></div>
-                      <div className="detail-row"><span className="detail-label">SFTP Port</span><span className="detail-value">{selectedForm.sftpPortNo || '-'}</span></div>
+                      <div className="detail-grid">
+                        <div className="detail-item"><span className="detail-label">Maker User ID</span><span className="detail-value">{selectedForm.makerUserId || '-'}</span></div>
+                        <div className="detail-item"><span className="detail-label">Checker User ID</span><span className="detail-value">{selectedForm.checkerUserId || '-'}</span></div>
+                        <div className="detail-item"><span className="detail-label">SFTP URL</span><span className="detail-value">{selectedForm.sftpUrl || '-'}</span></div>
+                        <div className="detail-item"><span className="detail-label">SFTP Port</span><span className="detail-value">{selectedForm.sftpPortNo || '-'}</span></div>
+                      </div>
                     </div>
 
                     {/* Section 5: Certificate & Bulk Download */}
                     <div className="detail-section">
                       <h6><i className="bi bi-file-earmark-lock me-2"></i>Certificate & Bulk Download</h6>
-                      <div className="detail-row"><span className="detail-label">Certificate Info</span><span className="detail-value">{selectedForm.certificateInfo || '-'}</span></div>
-                      <div className="detail-row"><span className="detail-label">Bulk Download</span><span className="detail-value">{selectedForm.bulkDownloadEnabled ? <span className="badge bg-success">Enabled</span> : <span className="badge bg-secondary">Disabled</span>}</span></div>
+                      <div className="detail-grid">
+                        <div className="detail-item"><span className="detail-label">Certificate Info</span><span className="detail-value">{selectedForm.certificateInfo || '-'}</span></div>
+                        <div className="detail-item"><span className="detail-label">Bulk Download</span><span className="detail-value">{selectedForm.bulkDownloadEnabled ? <span className="badge bg-success">Enabled</span> : <span className="badge bg-secondary">Disabled</span>}</span></div>
+                      </div>
                     </div>
 
                     {/* Section 6: IP Whitelisting */}
                     <div className="detail-section">
                       <h6><i className="bi bi-globe me-2"></i>API & IP Whitelisting</h6>
-                      <div className="detail-row"><span className="detail-label">API IP Whitelisting</span><span className="detail-value">{selectedForm.apiIPWhitelisting || '-'}</span></div>
-                      <div className="detail-row"><span className="detail-label">Microservice IP</span><span className="detail-value">{selectedForm.microserviceIPWhitelisting || '-'}</span></div>
-                      <div className="detail-row"><span className="detail-label">IP Whitelisting Confirmed</span><span className="detail-value">{selectedForm.ipWhitelistingConfirmed || '-'}</span></div>
+                      <div className="detail-grid">
+                        <div className="detail-item"><span className="detail-label">API IP Whitelisting</span><span className="detail-value">{selectedForm.apiIPWhitelisting || '-'}</span></div>
+                        <div className="detail-item"><span className="detail-label">Microservice IP</span><span className="detail-value">{selectedForm.microserviceIPWhitelisting || '-'}</span></div>
+                        <div className="detail-item"><span className="detail-label">IP Whitelisting Confirmed</span><span className="detail-value">{selectedForm.ipWhitelistingConfirmed || '-'}</span></div>
+                      </div>
                     </div>
 
                     {/* Section 7: Points of Contact */}
                     <div className="detail-section">
                       <h6><i className="bi bi-people me-2"></i>Points of Contact</h6>
-                      <div className="detail-row"><span className="detail-label">Technical SPOC</span><span className="detail-value">{selectedForm.technicalSPOCName || '-'}</span></div>
-                      <div className="detail-row"><span className="detail-label">Technical Email</span><span className="detail-value">{selectedForm.technicalSPOCEmail || '-'}</span></div>
-                      <div className="detail-row"><span className="detail-label">Technical Phone</span><span className="detail-value">{selectedForm.technicalSPOCPhone || '-'}</span></div>
-                      <div className="detail-row"><span className="detail-label">Business SPOC</span><span className="detail-value">{selectedForm.businessSPOCName || '-'}</span></div>
-                      <div className="detail-row"><span className="detail-label">Business Email</span><span className="detail-value">{selectedForm.businessSPOCEmail || '-'}</span></div>
-                      <div className="detail-row"><span className="detail-label">Business Phone</span><span className="detail-value">{selectedForm.businessSPOCPhone || '-'}</span></div>
+                      <div className="detail-grid">
+                        <div className="detail-item"><span className="detail-label">Technical SPOC</span><span className="detail-value">{selectedForm.technicalSPOCName || '-'}</span></div>
+                        <div className="detail-item"><span className="detail-label">Technical Email</span><span className="detail-value">{selectedForm.technicalSPOCEmail || '-'}</span></div>
+                        <div className="detail-item"><span className="detail-label">Technical Phone</span><span className="detail-value">{selectedForm.technicalSPOCPhone || '-'}</span></div>
+                        <div className="detail-item"><span className="detail-label">Business SPOC</span><span className="detail-value">{selectedForm.businessSPOCName || '-'}</span></div>
+                        <div className="detail-item"><span className="detail-label">Business Email</span><span className="detail-value">{selectedForm.businessSPOCEmail || '-'}</span></div>
+                        <div className="detail-item"><span className="detail-label">Business Phone</span><span className="detail-value">{selectedForm.businessSPOCPhone || '-'}</span></div>
+                      </div>
                     </div>
 
                     {/* Section 8: Sign-Off */}
                     <div className="detail-section">
                       <h6><i className="bi bi-pen me-2"></i>Sign-Off</h6>
-                      <div className="detail-row"><span className="detail-label">Sign-Off Name</span><span className="detail-value">{selectedForm.signOffName || '-'}</span></div>
-                      <div className="detail-row"><span className="detail-label">Designation</span><span className="detail-value">{selectedForm.signOffDesignation || '-'}</span></div>
-                      <div className="detail-row"><span className="detail-label">Sign-Off Date</span><span className="detail-value">{formatDate(selectedForm.signOffDate)}</span></div>
+                      <div className="detail-grid">
+                        <div className="detail-item"><span className="detail-label">Sign-Off Name</span><span className="detail-value">{selectedForm.signOffName || '-'}</span></div>
+                        <div className="detail-item"><span className="detail-label">Designation</span><span className="detail-value">{selectedForm.signOffDesignation || '-'}</span></div>
+                        <div className="detail-item"><span className="detail-label">Sign-Off Date</span><span className="detail-value">{formatDate(selectedForm.signOffDate)}</span></div>
+                      </div>
                     </div>
                   </>
                 ) : (
@@ -517,7 +548,8 @@ const FormList = () => {
                   <div className="me-auto d-flex gap-2">
                     <button
                       type="button"
-                      className="btn btn-success"
+                      className="btn btn-sm text-white"
+                      style={{ background: '#15803d' }}
                       onClick={() => handleStatusUpdate('Approved')}
                       disabled={updating}
                     >
@@ -526,7 +558,8 @@ const FormList = () => {
                     </button>
                     <button
                       type="button"
-                      className="btn btn-danger"
+                      className="btn btn-sm text-white"
+                      style={{ background: '#b91c1c' }}
                       onClick={() => handleStatusUpdate('Rejected')}
                       disabled={updating}
                     >
@@ -535,7 +568,9 @@ const FormList = () => {
                     </button>
                   </div>
                 )}
-                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Close</button>
+                <button type="button" className="btn btn-sm text-white" style={{ background: '#00569d' }} onClick={() => setShowModal(false)}>
+                  <i className="bi bi-x-lg me-1"></i>Close
+                </button>
               </div>
             </div>
           </div>
@@ -544,24 +579,61 @@ const FormList = () => {
 
 
       <style>{`
+        .env-tabs { display: inline-flex; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 10px; padding: 3px; }
+        .env-tab { background: none; border: none; padding: 7px 20px; font-size: 13px; font-weight: 500; color: #64748b; cursor: pointer; border-radius: 8px; transition: all 0.2s; }
+        .env-tab:hover { color: #00569d; }
+        .env-tab.active { background: linear-gradient(135deg, #00569d 0%, #0074d9 100%); color: white; }
         .dashboard-card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); }
         .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
         .status-pending { background-color: #fff3cd; color: #856404; }
         .status-approved { background-color: #d4edda; color: #155724; }
         .status-rejected { background-color: #f8d7da; color: #721c24; }
         .btn-view { padding: 4px 12px; font-size: 13px; }
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: flex; align-items: flex-start; justify-content: center; z-index: 1050; padding: 20px; overflow-y: auto; }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 30, 60, 0.5); display: flex; align-items: flex-start; justify-content: center; z-index: 1050; padding: 20px; overflow-y: auto; backdrop-filter: blur(2px); }
         .modal-dialog { width: 100%; max-width: 1000px; margin: 30px auto; position: relative; }
-        .modal-content { background: white; border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; max-height: calc(100vh - 60px); }
-        .modal-header { padding: 16px 20px; border-bottom: 1px solid #dee2e6; flex-shrink: 0; }
-        .modal-body { padding: 20px; overflow-y: auto; flex: 1 1 auto; min-height: 0; }
-        .modal-footer { padding: 16px 20px; border-top: 1px solid #dee2e6; display: flex; justify-content: flex-end; flex-shrink: 0; }
-        .detail-section { background: #f8f9fa; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
-        .detail-section h6 { color: #495057; border-bottom: 2px solid #dee2e6; padding-bottom: 10px; margin-bottom: 15px; }
-        .detail-row { display: flex; padding: 8px 0; border-bottom: 1px solid #e9ecef; }
-        .detail-label { font-weight: 500; color: #6c757d; min-width: 200px; flex-shrink: 0; }
-        .detail-value { color: #212529; }
-        .btn-close-white { filter: invert(1); }
+        .modal-content { background: white; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; max-height: calc(100vh - 60px); box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2); }
+        .modal-header-custom { background: linear-gradient(135deg, #00569d 0%, #0074d9 100%); color: white; padding: 0; flex-shrink: 0; }
+        .modal-header-top { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px 12px; }
+        .modal-header-left { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+        .modal-title-custom { font-size: 18px; font-weight: 600; margin: 0; }
+        .modal-header-meta { display: flex; align-items: center; gap: 8px; }
+        .modal-env-badge { background: rgba(255,255,255,0.2); padding: 3px 10px; border-radius: 6px; font-size: 12px; font-weight: 500; }
+        .modal-header-meta .status-badge { font-size: 11px; padding: 3px 10px; }
+        .modal-close-btn { background: rgba(255,255,255,0.15); border: none; color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s; font-size: 14px; }
+        .modal-close-btn:hover { background: rgba(255,255,255,0.3); }
+        .modal-header-info { display: flex; gap: 20px; padding: 10px 24px 14px; font-size: 13px; opacity: 0.9; flex-wrap: wrap; }
+        .modal-header-info-item { display: flex; align-items: center; }
+        .modal-body { padding: 24px; overflow-y: auto; flex: 1 1 auto; min-height: 0; background: #f8fafc; }
+        .modal-footer { padding: 14px 24px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; flex-shrink: 0; background: white; }
+        .detail-section { background: white; border-radius: 10px; padding: 20px; margin-bottom: 16px; border: 1px solid #e2e8f0; }
+        .detail-section h6 { color: #00569d; font-size: 14px; font-weight: 600; border-bottom: 1px solid #e8f0fa; padding-bottom: 10px; margin-bottom: 16px; }
+        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+        .detail-item { display: flex; flex-direction: column; padding: 10px 12px; border-bottom: 1px solid #f1f5f9; }
+        .detail-item:nth-child(odd) { border-right: 1px solid #f1f5f9; }
+        .detail-label { font-size: 11px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .detail-value { font-size: 14px; color: #1e293b; font-weight: 500; }
+        .infra-table { border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; }
+        .infra-table-header { display: grid; grid-template-columns: 2fr 1fr 2fr; padding: 10px 14px; background: #e8f0fa; font-size: 12px; font-weight: 600; color: #1e293b; text-transform: uppercase; letter-spacing: 0.5px; }
+        .infra-table-row { display: grid; grid-template-columns: 2fr 1fr 2fr; padding: 10px 14px; border-bottom: 1px solid #f1f5f9; font-size: 13px; align-items: center; }
+        .infra-table-row:last-child { border-bottom: none; }
+        .infra-table-row:hover { background: #f8fafc; }
+        .infra-table-row > span:first-child { color: #334155; font-weight: 500; }
+        .infra-table-row > span:last-child { color: #64748b; }
+        .infra-table-row .badge { color: white !important; padding: 5px 14px; font-size: 12.5px; font-weight: 500; }
+        .detail-value-text { color: #334155; font-weight: 500; }
+        #formsTable thead th { background-color: #e8f0fa !important; color: #1e293b; font-weight: 600; border-bottom: 2px solid #c5d8ef; }
+          .btn-new-form {
+          display: inline-flex;
+          align-items: center;
+          padding: 8px 20px;
+          background: #00569d;
+          color: white;
+          border-radius: 6px;
+          font-weight: 500;
+          font-size: 14px;
+          text-decoration: none;
+          transition: background 0.2s;
+        }
       `}</style>
     </div>
   );

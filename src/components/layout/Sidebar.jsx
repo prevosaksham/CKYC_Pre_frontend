@@ -10,13 +10,14 @@ const Sidebar = () => {
   const menuItems = isAdmin
     ? [
         { path: '/ckycform/dashboard', icon: 'bi-house-door', label: 'Dashboard' },
-        { path: '/ckycform/dashboard/forms', icon: 'bi-file-earmark-list', label: 'Form List' },
+        { path: '/ckycform/dashboard/forms', icon: 'bi-card-list', label: 'Form List' },
         // { path: '/ckycform/dashboard/client-status', icon: 'bi-shield-check', label: 'Client Status' },
         // { path: '/ckycform/dashboard/ckyc-data-count', icon: 'bi-bar-chart-line', label: 'CKYC Data Count' },
         { path: '/ckycform/dashboard/users', icon: 'bi-people', label: 'Users' },
+        { path: '/ckycform/dashboard/reports', icon: 'bi-globe', label: 'Domain Status' },
       ]
     : [
-        { path: '/ckycform/dashboard/forms', icon: 'bi-file-earmark-list', label: 'My Forms' },
+        { path: '/ckycform/dashboard/forms', icon: 'bi-card-list', label: 'My Forms' },
       ];
 
   return (
@@ -62,7 +63,7 @@ const Sidebar = () => {
 
         .sidebar-header {
           padding: 20px;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.15);
         }
 
         .logo {
@@ -99,7 +100,7 @@ const Sidebar = () => {
           font-size: 11px;
           text-transform: uppercase;
           letter-spacing: 1px;
-          color: var(--text-muted);
+          color: #fff;
         }
 
         .nav-list {
@@ -125,7 +126,7 @@ const Sidebar = () => {
         }
 
         .nav-item.active {
-          background-color: rgba(59, 130, 246, 0.15);
+          background-color: rgba(77, 166, 232, 0.15);
           border-left-color: var(--sidebar-active);
           color: white;
         }
