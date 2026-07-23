@@ -448,11 +448,16 @@ const RecordsTab = () => {
           {/* API Content */}
           {activeMethod === 'api' && (
             <div className="upload-content" key="api">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '20px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+              <p style={{ fontSize: '14px', color: '#475569' }}>
+                This method enables direct integration with the CKYC platform using REST APIs. The API documentation contains all required integration details, including authentication, endpoints, request/response payloads, and status APIs.
+              </p>
+              {/* <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '20px', background: '#e8f0fa', borderRadius: '8px', border: '1px solid #c5d8ef' }}>
+                <i className="bi bi-braces" style={{ fontSize: '32px', color: '#00569d' }}></i>
                 <div>
-                  <div style={{ fontWeight: 600, color: '#1e293b', fontSize: '14px' }}>API upload method details.</div>
+                  <div style={{ fontWeight: 600, color: '#1e293b', fontSize: '14px' }}>REST API Integration</div>
+                  <div style={{ fontSize: '13px', color: '#64748b' }}>Refer to the API documentation for authentication, endpoints, request/response payloads, and status APIs.</div>
                 </div>
-              </div>
+              </div> */}
             </div>
           )}
 
