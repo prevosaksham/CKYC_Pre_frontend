@@ -83,7 +83,8 @@ const faqApi = axios.create({
 });
 
 export const faqAPI = {
-  getAll: () => faqApi.get('/api/faqs/getAllFaqs'),
+  // getAll: () => faqApi.get('/api/faqs/getAllFaqs'),
+  getAll: () => faqApi.get('/api/faqs'),
 };
 
 export default api;
