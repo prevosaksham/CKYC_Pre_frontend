@@ -1769,7 +1769,7 @@ console.log('missing fields:', missingFields);
                                 <td>1</td>
                                 <td>
                                   Hardware Requirements (UAT) <span className="text-danger">**</span><br />
-                                  <small className="text-muted">Recomended : 4 vCPUs / 16 GB RAM</small>
+                                  <small className="text-muted">Recomended : 4 vCPUs / 16 GB RAM / 50 GB SSD (2 Servers)</small>
                                 </td>
                                 <td>
                                   <select
